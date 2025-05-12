@@ -33,3 +33,12 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getUser = async (req, res) => {
+  try {
+    // The user is already attached to the request by the auth middleware
+    res.json(req.user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
