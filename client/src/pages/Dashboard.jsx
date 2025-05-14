@@ -1,11 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { IconButton } from '@material-tailwind/react';
-import { SunIcon } from '@heroicons/react/24/solid';
+import { IconButton, Button } from '@material-tailwind/react';
+import { SunIcon , PowerIcon} from '@heroicons/react/24/solid';
 
 const Dashboard = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading , logout} = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,6 +56,14 @@ const Dashboard = () => {
             <IconButton className="p-2 text-gray-600">
               <SunIcon className="w-5 h-5" />
             </IconButton>
+            
+            <Button
+              onClick={logout}
+              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded shadow"
+            >
+              <PowerIcon className="h-5 w-5" />
+              Logout
+            </Button>
             <img src="https://via.placeholder.com/32" alt="Profile" className="rounded-full w-8 h-8" />
           </div>
         </header>

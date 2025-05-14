@@ -6,6 +6,7 @@ import HeroSection16 from "./components/Navbar";
 import FeatureSection from "./components/Sample";
 import CoursesPage from "./pages/CoursesPage";
 import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./context/ProtectedRoute";
 
 function App() {
   return <>
@@ -14,7 +15,11 @@ function App() {
         <Route path="/" element={<HeroSection16/>}></Route>
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
-        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard/> 
+            </ProtectedRoute>
+          } />
       </Routes>
     </Router>
   </>
