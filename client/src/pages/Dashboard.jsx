@@ -22,6 +22,11 @@ const Dashboard = () => {
     return null;
   }
 
+  const handleCourseView = (course) => {
+    const formattedCourse = course.toLowerCase().replace(/\s+/g, '');
+    navigate(`/courses/${formattedCourse}`);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -121,11 +126,11 @@ const Dashboard = () => {
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-4">Available Courses</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {["DSA", "Frontend", "Backend", "Aptitude"].map((course, index) => (
+              {["Computer Languages","DSA", "Frontend", "Backend", "Aptitude"].map((course, index) => (
                 <div key={index} className="border p-4 rounded shadow hover:shadow-lg transition">
                   <h4 className="text-md font-bold">{course} Course</h4>
                   <p className="text-sm text-gray-600">Includes videos, notes, quizzes, and coding challenges.</p>
-                  <button className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                  <button  onClick={() => handleCourseView(course)} className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                     View Course
                   </button>
                 </div>
