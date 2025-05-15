@@ -6,33 +6,10 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import {
-  RectangleStackIcon,
-  UserCircleIcon,
-  CommandLineIcon,
-  Squares2X2Icon,
-} from "@heroicons/react/24/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import FeatureSection from "./Sample";
 import CoursesPage from "../pages/CoursesPage";
 import { Link } from "react-router-dom";
-
-// Navigation item component
-function NavItem({ children }) {
-  return (
-    <li>
-      <Typography
-        as="a"
-        href="#"
-        variant="paragraph"
-        color="blue-gray"
-        className="text-blue-gray-700 flex items-center gap-2 font-medium"
-      >
-        {children}
-      </Typography>
-    </li>
-  );
-}
 
 // Main Hero Section component
 function HeroSection() {
@@ -50,27 +27,48 @@ function HeroSection() {
   return (
     <>
       {/* Navbar */}
-      <Navbar shadow={false} fullWidth className="border-0 ">
-        <div className="container mx-auto flex items-center justify-between gap-0.5 p-2">
-          <Typography className="text-3xl font-bold text-blue-500 px-1">
+      <Navbar shadow={false} fullWidth className="border-0 py-2 px-4 lg:px-8">
+        <div className="container mx-auto flex items-center justify-between">
+          <Typography className="text-3xl font-bold text-blue-500">
             EasyLearn
           </Typography>
-          <div className="hidden items-center gap-4 lg:flex">
-            <Button variant="text" className="text-lg p-3">
-              <Link to='/login'>Log in</Link> 
+
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Button variant="text" className="text-lg">
+              <Link to="/login">Log in</Link>
             </Button>
-            <Button color="gray" className="text-lg p-3 text-black">
-              <Link to='/register'>Sign Up</Link>
+            <Button color="gray" className="text-lg text-black">
+              <Link to="/register">Sign Up</Link>
             </Button>
           </div>
+
+          {/* Hamburger Icon */}
           <IconButton
             variant="text"
             color="gray"
             onClick={handleOpen}
-            className="ml-auto inline-block lg:hidden"
+            className="lg:hidden"
           >
+            {open ? (
+              <XMarkIcon className="h-6 w-6" />
+            ) : (
+              <Bars3Icon className="h-6 w-6" />
+            )}
           </IconButton>
         </div>
+
+        {/* Mobile Menu */}
+        <Collapse open={open}>
+          <div className="flex flex-col items-start gap-2 px-4 pt-4 pb-4 lg:hidden">
+            <Button variant="text" fullWidth className="text-left">
+              <Link to="/login">Log in</Link>
+            </Button>
+            <Button color="gray" fullWidth className="text-black text-left">
+              <Link to="/register">Sign Up</Link>
+            </Button>
+          </div>
+        </Collapse>
       </Navbar>
 
       {/* Hero Section */}
@@ -95,7 +93,6 @@ function HeroSection() {
             The time to learn is now. Explore, grow, and transform your future.
           </Typography>
 
-          {/* Explore Button */}
           <div className="mt-8">
             <Button
               color="green"
@@ -108,8 +105,9 @@ function HeroSection() {
           </div>
         </div>
       </header>
-      <FeatureSection/>
-      <CoursesPage/>
+
+      <FeatureSection />
+      {/* <CoursesPage /> */}
     </>
   );
 }
