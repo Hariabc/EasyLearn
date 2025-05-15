@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext'; // Import the AuthContext
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import graduateImg from '../../assets/education_10353866.png';
+import api from '../../axios'; // Use the configured axios instance
 
 const SignIn = () => {
   const { login } = useContext(AuthContext); // Get login function from context
@@ -18,7 +18,7 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await api.post('/api/auth/login', {
         email,
         password,
       });

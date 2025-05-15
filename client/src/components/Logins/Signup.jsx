@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import graduateImg from '../../assets/education_10353866.png';
+import api from '../../axios'; // Use your pre-configured axios instance
 
 const SignUp = () => {
   const { login } = useContext(AuthContext);
@@ -25,13 +25,14 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      // Register user
+      await api.post('/api/auth/register', {
         email,
         password,
       });
 
-      // After successful registration, log the user in
-      const loginResponse = await axios.post('http://localhost:5000/api/auth/login', {
+      // Log user in after successful registration
+      const loginResponse = await api.post('/api/auth/login', {
         email,
         password,
       });
@@ -65,11 +66,10 @@ const SignUp = () => {
                 </label>
                 <input
                   type="email"
-                  name="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                   required
                 />
@@ -80,12 +80,11 @@ const SignUp = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
                 />
               </div>
@@ -95,12 +94,11 @@ const SignUp = () => {
                 </label>
                 <input
                   type="password"
-                  name="confirmPassword"
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
                 />
               </div>
@@ -108,13 +106,13 @@ const SignUp = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full text-white bg-green-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
+                className="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50"
               >
                 {loading ? 'Creating account...' : 'Create account'}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{' '}
-                <a href="/login" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                <a href="/login" className="font-medium text-white hover:underline">
                   Sign in
                 </a>
               </p>
@@ -126,4 +124,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp; 
+export default SignUp;

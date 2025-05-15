@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../axios';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await axios.get('https://easylearn-6qg4.onrender.com/', {
+      const response = await axios.get('/api/auth/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
