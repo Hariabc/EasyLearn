@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/auth/user', {
+      const response = await axios.get('https://easylearn-6qg4.onrender.com/', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
