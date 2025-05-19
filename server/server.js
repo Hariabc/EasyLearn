@@ -18,7 +18,7 @@ app.use(express.json());
 
 // CORS setup — add your frontend URL here
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://easylearn-6qg4.onrender.com'], // Updated render.com URL
+  origin: ['http://localhost:5173', 'https://easylearn-1-bt4h.onrender.com'], // Updated render.com URL
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
