@@ -5,7 +5,6 @@ import { Button } from '@material-tailwind/react';
 import { SunIcon, PowerIcon, Bars3Icon, XMarkIcon, AcademicCapIcon, ClipboardDocumentListIcon, TrophyIcon, StarIcon, ChatBubbleLeftRightIcon, Squares2X2Icon, Cog6ToothIcon } from '@heroicons/react/24/solid';
 import { theme } from '../theme/theme';
 import logo from "../assets/education_10353866.png"
-import Discussion from '../components/Discussion';
 
 const navItems = [
   { icon: <Squares2X2Icon className="h-6 w-6" />, text: 'Dashboard' },
@@ -21,7 +20,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const discussionRef = React.useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,31 +48,6 @@ const Dashboard = () => {
   };
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleNavigation = (text) => {
-    switch (text) {
-      case "Dashboard":
-        navigate("/dashboard");
-        break;
-      case "My Courses":
-        navigate("/dashboard");
-        break;
-      case "Quizzes":
-        navigate("/quizzes");
-        break;
-      case "Contests":
-        navigate("/contests");
-        break;
-      case "Rewards":
-        navigate("/rewards");
-        break;
-      case "Discussion Forum":
-        discussionRef.current?.scrollIntoView({ behavior: 'smooth' });
-        break;
-      default:
-        break;
-    }
   };
 
   return (
@@ -123,7 +96,6 @@ const Dashboard = () => {
                 hover:bg-blue-50 hover:text-blue-600
                 ${!isSidebarOpen && 'lg:justify-center px-0'}
               `}
-              onClick={() => handleNavigation(item.text)}
             >
               <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-500">
                 {item.icon}
@@ -215,11 +187,6 @@ const Dashboard = () => {
                 </div>
               ))}
             </div>
-          </section>
-
-          {/* Discussion Section */}
-          <section ref={discussionRef} className="bg-white p-4 lg:p-8 rounded-xl shadow">
-            <Discussion />
           </section>
         </main>
       </div>
