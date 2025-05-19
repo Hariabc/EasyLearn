@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const discussionRoutes = require('./routes/discussionRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +18,7 @@ app.use(express.json());
 
 // CORS setup — add your frontend URL here
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://easylearn-1-bt4h.onrender.com'], // add both local and deployed URLs
+  origin: ['http://localhost:5173', 'https://easylearn-6qg4.onrender.com'], // Updated render.com URL
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -30,6 +31,7 @@ app.get('/api/test', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/discussions', discussionRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -44,5 +46,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`CORS enabled for http://localhost:5173 and https://easylearn-1-bt4h.onrender.com`);
+  console.log(`CORS enabled for http://localhost:5173 and https://easylearn-6qg4.onrender.com`);
 });
