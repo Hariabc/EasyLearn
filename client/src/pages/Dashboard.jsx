@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Button } from '@material-tailwind/react';
 import { SunIcon, PowerIcon, Bars3Icon, XMarkIcon, AcademicCapIcon, ClipboardDocumentListIcon, TrophyIcon, StarIcon, ChatBubbleLeftRightIcon, Squares2X2Icon, Cog6ToothIcon } from '@heroicons/react/24/solid';
-import { theme } from '../theme/theme';
 import logo from "../assets/education_10353866.png"
 
 const navItems = [
