@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { IconButton, Button } from '@material-tailwind/react';
 import { SunIcon, PowerIcon } from '@heroicons/react/24/solid';
+import api from "../axios";
 
 const Dashboard = () => {
   const { user, loading, logout, authToken } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [courses, setCourses] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -17,9 +22,6 @@ const Dashboard = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const [courses, setCourses] = useState([]);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -30,27 +32,28 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/courses');
-        const data = await response.json();
+        const { data } = await api.get('/api/courses');
         setCourses(data);
       } catch (error) {
         console.error("Error fetching courses:", error);
+      } finally {
+        setCoursesLoading(false);
       }
     };
 
     const fetchEnrolledCourses = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+        const { data } = await api.get(`/api/users/${user._id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        const data = await response.json();
+
         if (Array.isArray(data.enrolledCourses)) {
-  setEnrolledCourses(data.enrolledCourses);
-} else {
-  setEnrolledCourses([]); 
-}
+          setEnrolledCourses(data.enrolledCourses);
+        } else {
+          setEnrolledCourses([]);
+        }
       } catch (error) {
         console.error("Error fetching enrolled courses:", error);
       }
@@ -64,19 +67,18 @@ const Dashboard = () => {
 
   const handleEnroll = async (courseId) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/enroll', {
-        method: 'POST',
+      const response = await api.post('/api/users/enroll', {
+        userId: user._id,
+        courseId,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ userId: user._id, courseId }),
+        }
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         const newCourse = courses.find(course => course._id === courseId);
-       setEnrolledCourses(prev => [...prev, { course: newCourse, progress: 0 }]);
-
+        setEnrolledCourses(prev => [...prev, { course: newCourse, progress: 0 }]);
       } else {
         console.error('Failed to enroll in course');
       }
@@ -84,11 +86,11 @@ const Dashboard = () => {
       console.error('Error enrolling in course:', error);
     }
   };
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  console.log(enrolledCourses);
   const handleCourseView = (course) => {
     navigate(`/courses/${course.slug}?id=${course._id}`);
   };
@@ -181,7 +183,9 @@ const Dashboard = () => {
                           className="transition-all duration-300 ease-out"
                         />
                       </svg>
-                      <div className="absolute text-xl font-semibold text-gray-800">{Math.round(course.completionPercent || 0)}%</div>
+                      <div className="absolute text-xl font-semibold text-gray-800">
+                        {Math.round(course.completionPercent || 0)}%
+                      </div>
                     </div>
                   </div>
                   <button onClick={() => handleCourseView(course.course)} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
@@ -191,31 +195,36 @@ const Dashboard = () => {
               ))}
             </div>
           </section>
+
           {/* Available Courses */}
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-4">Available Courses</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availableCourses.map((course, index) => (
-                <div key={index} className="border p-4 rounded shadow hover:shadow-lg transition">
-                  <h4 className="text-md font-bold">{course.title}</h4>
-                  <p className="text-sm text-gray-600">Includes videos, notes, quizzes, and coding challenges.</p>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      onClick={() => handleCourseView(course)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      View Course
-                    </button>
-                    <button
-                      onClick={() => handleEnroll(course._id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                    >
-                      Enroll
-                    </button>
+            {coursesLoading ? (
+              <p>Loading courses...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {availableCourses.map((course, index) => (
+                  <div key={index} className="border p-4 rounded shadow hover:shadow-lg transition">
+                    <h4 className="text-md font-bold">{course.title}</h4>
+                    <p className="text-sm text-gray-600">Includes videos, notes, quizzes, and coding challenges.</p>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => handleCourseView(course)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        View Course
+                      </button>
+                      <button
+                        onClick={() => handleEnroll(course._id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      >
+                        Enroll
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
         </main>
       </div>
@@ -224,4 +233,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
