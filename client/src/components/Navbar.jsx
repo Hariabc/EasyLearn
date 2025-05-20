@@ -1,115 +1,110 @@
-import React from "react";
-import {
-  Navbar,
-  Collapse,
-  Button,
-  IconButton,
-  Typography,
-} from "@material-tailwind/react";
-import {
-  RectangleStackIcon,
-  UserCircleIcon,
-  CommandLineIcon,
-  Squares2X2Icon,
-} from "@heroicons/react/24/solid";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import FeatureSection from "./Sample";
 import CoursesPage from "../pages/CoursesPage";
-import { Link } from "react-router-dom";
 
-// Navigation item component
-function NavItem({ children }) {
-  return (
-    <li>
-      <Typography
-        as="a"
-        href="#"
-        variant="paragraph"
-        color="blue-gray"
-        className="text-blue-gray-700 flex items-center gap-2 font-medium"
-      >
-        {children}
-      </Typography>
-    </li>
-  );
-}
-
-// Main Hero Section component
 function HeroSection() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen((cur) => !cur);
+  const [isOpen, setIsOpen] = useState(false);
 
-  React.useEffect(() => {
+  // Close menu when window is resized
+  useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 960) setOpen(false);
+      if (window.innerWidth >= 768) {
+        setIsOpen(false);
+      }
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
     <>
       {/* Navbar */}
-      <Navbar shadow={false} fullWidth className="border-0 ">
-        <div className="container mx-auto flex items-center justify-between gap-0.5 p-2">
-          <Typography className="text-3xl font-bold text-blue-500 px-1">
-            EasyLearn
-          </Typography>
-          <div className="hidden items-center gap-4 lg:flex">
-            <Button variant="text" className="text-lg p-3">
-              <Link to='/login'>Log in</Link> 
-            </Button>
-            <Button color="gray" className="text-lg p-3 text-black">
-              <Link to='/register'>Sign Up</Link>
-            </Button>
+      <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Link to="/" className="text-3xl font-bold text-blue-500">
+                EasyLearn
+              </Link>
+            </div>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link to="/login">
+                <button className="px-4 py-2 text-gray-700 hover:text-blue-500">
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                  Sign Up
+                </button>
+              </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-500 focus:outline-none"
+              >
+                {isOpen ? (
+                  <XMarkIcon className="h-6 w-6" />
+                ) : (
+                  <Bars3Icon className="h-6 w-6" />
+                )}
+              </button>
+            </div>
           </div>
-          <IconButton
-            variant="text"
-            color="gray"
-            onClick={handleOpen}
-            className="ml-auto inline-block lg:hidden"
-          >
-          </IconButton>
         </div>
-      </Navbar>
+
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
+              <Link to="/login">
+                <button className="w-full text-left px-3 py-2 text-gray-700 hover:text-blue-500">
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="w-full text-left px-3 py-2 text-gray-700 hover:text-blue-500">
+                  Sign Up
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Hero Section */}
-      <header className="bg-white px-4 pt-40 lg:pb-20 h-screen">
+      <header className="bg-white px-4 pt-50 pb-20 h-auto lg:h-screen">
         <div className="container mx-auto text-center">
-          <Typography className="mx-auto mb-4 inline-flex items-center justify-center rounded-lg border border-blue-gray-100 bg-white px-4 py-1 text-xs font-medium">
+          <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-lg border border-blue-100 bg-white px-4 py-1 text-xs font-medium">
             Exciting News! Start your learning journey today
-          </Typography>
-          <Typography
-            variant="h1"
-            color="blue-gray"
-            className="mx-auto mb-6 max-w-3xl text-3xl font-bold leading-tight lg:text-5xl drop-shadow-sm"
-          >
+          </div>
+          <h1 className="mx-auto mb-6 max-w-3xl text-3xl font-bold leading-tight lg:text-5xl">
             Unlock your potential with{" "}
             <span className="text-blue-500">knowledge</span> and{" "}
             <span className="text-blue-500">skills</span> you can use.
-          </Typography>
-          <Typography
-            variant="lead"
-            className="mx-auto mb-10 max-w-xl text-gray-600"
-          >
+          </h1>
+          <p className="mx-auto mb-10 max-w-xl text-gray-600 text-lg">
             The time to learn is now. Explore, grow, and transform your future.
-          </Typography>
+          </p>
 
-          {/* Explore Button */}
-          <div className="mt-8">
-            <Button
-              color="green"
-              size="lg"
-              className="p-3 bg-amber-50 text-black"
-              aria-label="Explore Courses"
-            >
-              Explore Courses
-            </Button>
-          </div>
+          <button className="px-6 py-3 bg-amber-50 text-black rounded-md hover:bg-amber-100 transition-colors">
+            Explore Courses
+          </button>
         </div>
       </header>
-      <FeatureSection/>
-      <CoursesPage/>
+
+      {/* Other sections */}
+      <FeatureSection />
+      <CoursesPage />
     </>
   );
 }

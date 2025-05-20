@@ -1,6 +1,6 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -26,13 +26,18 @@ const app = express();
 app.use(express.json());
 
 
-// CORS configuration
+// CORS setup — add your frontend URL here
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://easylearn-1-bt4h.onrender.com'], // add both local and deployed URLs
+  origin: ['http://localhost:5173', 'https://easylearn-1-bt4h.onrender.com'], // Updated render.com URL
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is running!' });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
