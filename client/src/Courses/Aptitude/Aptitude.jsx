@@ -1,43 +1,109 @@
-import React from 'react';
-import { Card, CardHeader, CardBody, Typography } from '@material-tailwind/react';
-import { useNavigate } from 'react-router-dom';
-
-const aptitudeCategories = [
-  { name: 'Quantitative', color: 'bg-blue-500' },
-  { name: 'Logical Reasoning', color: 'bg-green-500' },
-  { name: 'Verbal Ability', color: 'bg-red-500' },
-  { name: 'Data Interpretation', color: 'bg-purple-500' },
-];
-
+import React, { useState, useEffect, useContext } from 'react';
+import { Card, CardHeader, CardBody, Typography, Progress } from '@material-tailwind/react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 const Aptitude = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get('id');
+  const [languages, setLanguages] = useState([]);
+  const [userCourseProgress, setUserCourseProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user, authToken } = useContext(AuthContext);
 
-  const handleClick = (category) => {
-    const categoryParam = category.toLowerCase().replace(/\s+/g, '-');
-    navigate(`/courses/aptitude/${categoryParam}`);
+  // Fetch languages for the course
+  const fetchLanguages = async () => {
+    const res = await fetch(`http://localhost:5000/api/languages/${courseId}`);
+    if (!res.ok) throw new Error('Failed to fetch languages');
+    return await res.json();
   };
 
-  return (
-    <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {aptitudeCategories.map(({ name, color }) => (
-        <Card
-          key={name}
-          className="shadow-lg cursor-pointer hover:shadow-xl transition"
-          onClick={() => handleClick(name)}
-        >
-          <CardHeader className={`${color} text-white text-center py-6`}>
+  // Fetch user data with progress
+  const fetchUserProgress = async () => {
+    const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    if (!res.ok) throw new Error('Failed to fetch user progress');
+    const data = await res.json();
+    // Find progress for the current course by matching course._id with courseId
+    const progress = data.enrolledCourses.find(c => c.course._id === courseId);
+    return progress || null;
+  };
 
-            <Typography variant="h5">{name}</Typography>
-          </CardHeader>
-          <CardBody>
-            <Typography variant="small">
-              Practice {name} questions and boost your problem-solving skills.
-            </Typography>
-          </CardBody>
-        </Card>
-      ))}
-    </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [langs, progress] = await Promise.all([fetchLanguages(), fetchUserProgress()]);
+        setLanguages(langs);
+        setUserCourseProgress(progress);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (courseId && user && authToken) {
+      fetchData();
+    }
+  }, [courseId, user, authToken]);
+
+  const handleClick = (languageId) => {
+    navigate(`/courses/aptitude/${languageId}`);
+  };
+
+  if (loading) return <div>Loading aptitude languages...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  const totalLanguages = languages.length;
+  const completedLanguages = userCourseProgress?.languages?.filter(lang =>
+    lang.isCompleted || lang.completionPercent === 100
+  )?.length || 0;
+
+  return (
+    <>
+      <div className="px-8 pb-2">
+        <Typography variant="h4" className="mb-1">Languages</Typography>
+        <Typography variant="small" className="text-gray-700">
+          {completedLanguages} of {totalLanguages} languages completed
+        </Typography>
+      </div>
+
+      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {languages.map(({ _id, name }) => {
+          const progressEntry = userCourseProgress?.languages?.find(lang =>
+            String(lang.language?._id || lang.language) === String(_id)
+          );
+          const percent = progressEntry?.completionPercent || 0;
+
+          return (
+            <Card
+              key={_id}
+              className="shadow-lg cursor-pointer hover:shadow-xl transition"
+              onClick={() => handleClick(_id)}
+            >
+              <CardHeader color="blue" className="text-white text-center py-6">
+                <Typography variant="h5">{name}</Typography>
+              </CardHeader>
+              <CardBody>
+                <Typography variant="small" className="mb-2">
+                  Explore {name} tutorials and resources.
+                </Typography>
+                <div className="mt-2">
+                  <Progress value={percent} color={percent === 100 ? "green" : "blue"} />
+                  <Typography variant="small" className="text-right mt-1 text-gray-600">
+                    {percent}% completed
+                  </Typography>
+                </div>
+              </CardBody>
+            </Card>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

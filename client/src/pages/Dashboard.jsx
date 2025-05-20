@@ -1,12 +1,15 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { IconButton, Button } from '@material-tailwind/react';
-import { SunIcon , PowerIcon} from '@heroicons/react/24/solid';
+import { SunIcon, PowerIcon } from '@heroicons/react/24/solid';
 
 const Dashboard = () => {
-  const { user, loading , logout} = useContext(AuthContext);
+  const { user, loading, logout, authToken } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const [courses, setCourses] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -14,18 +17,75 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/courses');
+        const data = await response.json();
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
 
-  if (!user) {
-    return null;
-  }
+    const fetchEnrolledCourses = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const data = await response.json();
+        if (Array.isArray(data.enrolledCourses)) {
+  setEnrolledCourses(data.enrolledCourses);
+} else {
+  setEnrolledCourses([]); 
+}
+      } catch (error) {
+        console.error("Error fetching enrolled courses:", error);
+      }
+    };
 
-  const handleCourseView = (course) => {
-    const formattedCourse = course.toLowerCase().replace(/\s+/g, '');
-    navigate(`/courses/${formattedCourse}`);
+    if (user && authToken) {
+      fetchCourses();
+      fetchEnrolledCourses();
+    }
+  }, [user, authToken]);
+
+  const handleEnroll = async (courseId) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/users/enroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ userId: user._id, courseId }),
+      });
+
+      if (response.ok) {
+        const newCourse = courses.find(course => course._id === courseId);
+       setEnrolledCourses(prev => [...prev, { course: newCourse, progress: 0 }]);
+
+      } else {
+        console.error('Failed to enroll in course');
+      }
+    } catch (error) {
+      console.error('Error enrolling in course:', error);
+    }
   };
+
+  console.log(enrolledCourses);
+  const handleCourseView = (course) => {
+    navigate(`/courses/${course.slug}?id=${course._id}`);
+  };
+
+  const availableCourses = courses.filter(course =>
+    !enrolledCourses.some(enrolled => enrolled.course._id === course._id)
+  );
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return null;
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -34,7 +94,7 @@ const Dashboard = () => {
         <div className="p-6 font-bold text-lg border-b">EasyLearn</div>
         <nav className="p-4 space-y-4">
           <a href="#" className="block text-gray-700 hover:text-blue-600">Dashboard</a>
-          <a href="#" className="block text-gray-700 hover:text-blue-600">My Courses</a>
+          <button className="block text-left w-full text-gray-700 hover:text-blue-600">My Courses</button>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Quizzes</a>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Contests</a>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Rewards</a>
@@ -57,11 +117,9 @@ const Dashboard = () => {
               <span className="material-icons text-gray-600">notifications</span>
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">3</span>
             </button>
-            {/* Theme Toggle Icon */}
             <IconButton className="p-2 text-gray-600">
               <SunIcon className="w-5 h-5" />
             </IconButton>
-            
             <Button
               onClick={logout}
               className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded shadow"
@@ -73,9 +131,9 @@ const Dashboard = () => {
           </div>
         </header>
 
-        {/* Content Area */}
+        {/* Content */}
         <main className="p-6 overflow-y-auto">
-          {/* User Profile */}
+          {/* Profile Section */}
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <div className="flex items-center space-x-6">
               <img src="https://via.placeholder.com/64" alt="User" className="rounded-full w-16 h-16" />
@@ -90,11 +148,10 @@ const Dashboard = () => {
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-4">Ongoing Courses</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {["DSA", "Frontend", "Backend", "Aptitude"].map((course, index) => (
+              {enrolledCourses.map((course, index) => (
                 <div key={index} className="border p-4 rounded shadow hover:shadow-lg transition">
-                  <h4 className="text-md font-bold">{course} Course</h4>
+                  <h4 className="text-md font-bold">{course.course.title}</h4>
                   <p className="text-sm text-gray-600">Includes videos, notes, quizzes, and coding challenges.</p>
-                  {/* Progress Circle */}
                   <div className="mt-4 flex justify-center">
                     <div className="relative flex items-center justify-center">
                       <svg width="80" height="80" className="transform rotate-90">
@@ -107,15 +164,15 @@ const Dashboard = () => {
                           strokeWidth="8"
                           fill="none"
                           strokeDasharray="220"
-                          strokeDashoffset="88"
+                          strokeDashoffset={`${220 - (220 * (course.completionPercent || 0) / 100)}`}
                           className="transition-all duration-300 ease-out"
                         />
                       </svg>
-                      <div className="absolute text-xl font-semibold text-gray-800">60%</div>
+                      <div className="absolute text-xl font-semibold text-gray-800">{Math.round(course.completionPercent || 0)}%</div>
                     </div>
                   </div>
-                  <button className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    View Course
+                  <button onClick={() => handleCourseView(course.course)} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                    Continue Course
                   </button>
                 </div>
               ))}
@@ -126,13 +183,24 @@ const Dashboard = () => {
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-4">Available Courses</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {["Computer Languages","DSA", "Frontend", "Backend", "Aptitude"].map((course, index) => (
+              {availableCourses.map((course, index) => (
                 <div key={index} className="border p-4 rounded shadow hover:shadow-lg transition">
-                  <h4 className="text-md font-bold">{course} Course</h4>
+                  <h4 className="text-md font-bold">{course.title}</h4>
                   <p className="text-sm text-gray-600">Includes videos, notes, quizzes, and coding challenges.</p>
-                  <button  onClick={() => handleCourseView(course)} className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    View Course
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => handleCourseView(course)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    >
+                      View Course
+                    </button>
+                    <button
+                      onClick={() => handleEnroll(course._id)}
+                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    >
+                      Enroll
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

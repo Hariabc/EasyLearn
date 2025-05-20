@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Typography,
   List,
@@ -7,8 +7,11 @@ import {
   Textarea,
   Button,
   Spinner,
+  Rating,
 } from '@material-tailwind/react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import QuizQuestion from '../components/QuizComponent';
+import { AuthContext } from '../context/AuthContext';
 
 const tabs = [
   'Notes',
@@ -19,43 +22,88 @@ const tabs = [
   'AI Assistance',
 ];
 
-const dummyContent = {
-  Notes: 'Here are the notes for this topic.',
-  'Watch Video': 'Watch the introduction and advanced videos here.',
-  Quiz: 'Start quizzes to test your knowledge.',
-  'Coding Practice': 'Practice coding problems here.',
-  Feedback: 'Provide your feedback.',
-};
-
 const CourseDetail = () => {
-  const { language, topic } = useParams(); // handles /:language/:topic or /dsa/:topic
+  const { language, topic } = useParams();
+  const [searchParams] = useSearchParams();
+  const topicId = searchParams.get('topicId');
+  const { user, authToken } = React.useContext(AuthContext);
+  const [courseId, setCourseId] = useState('');
+  const [languageId, setLanguageId] = useState('');
   const [selectedTab, setSelectedTab] = useState('Notes');
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [aiLoading, setaiLoading] = useState(false);
+  const [dataLoading, setdataLoading] = useState(true);
+  const [topicData, setTopicData] = useState(null);
+  const [quizData, setQuizData] = useState(null);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [fetchError, setFetchError] = useState(null);
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
+  const [isTopicCompleted, setIsTopicCompleted] = useState(false);
+
+  useEffect(() => {
+    const fetchTopicDetails = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/topics/topicById/${topicId}`);
+        if (!res.ok) throw new Error('Failed to load topic data.');
+        const data = await res.json();
+        setTopicData(data);
+        setCourseId(data.course);
+        setLanguageId(data.language);
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setdataLoading(false);
+      }
+    };
+
+    const fetchQuizData = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/quizzes/${topicId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setQuizData(data);
+        }
+      } catch (err) {
+        console.error('Quiz fetch error:', err);
+      }
+    };
+
+    const fetchFeedbackData = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/feedbacks/byTopic/${topicId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFeedbackData(data);
+        }
+      } catch (err) {
+        console.error('Feedback fetch error:', err);
+      }
+    };
+
+    if (topicId) {
+      fetchTopicDetails();
+      fetchQuizData();
+      fetchFeedbackData();
+    }
+  }, [topicId]);
 
   const handleAIRequest = async () => {
     if (!prompt.trim()) return;
-
-    setLoading(true);
+    setaiLoading(true);
     setResponse('');
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      console.log(apiKey);
-
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
         }
       );
-
       const data = await res.json();
       const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       setResponse(aiText || 'No response generated from Gemini.');
@@ -63,13 +111,197 @@ const CourseDetail = () => {
       console.error('AI error:', error);
       setResponse('An error occurred while fetching AI response.');
     } finally {
-      setLoading(false);
+      setaiLoading(false);
+    }
+  };
+
+  const handleOptionChange = (questionIndex, selectedOption) => {
+    setSelectedOptions((prev) => ({ ...prev, [questionIndex]: selectedOption }));
+  };
+
+
+  const handleSubmitQuiz = async () => {
+    const questions = quizData?.[0]?.questions || [];
+    let newScore = 0;
+    questions.forEach((q, idx) => {
+      if (selectedOptions[idx] === q.correctAnswer) newScore++;
+    });
+    setScore(newScore);
+    setIsSubmitted(true);
+
+    if (newScore === questions.length) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/markComplete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            courseId,
+            languageId,
+            topicId,
+          }),
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          setIsTopicCompleted(true);
+          console.log('Topic marked as completed:', result);
+        } else {
+          console.error('Failed to mark topic as complete:', result);
+        }
+      } catch (err) {
+        console.error('Error marking topic as complete:', err);
+      }
+    }
+  };
+
+  const renderContent = () => {
+    if (fetchError) return <Typography color="red">{fetchError}</Typography>;
+    if (dataLoading) return <Typography>Loading topic data...</Typography>;
+
+    switch (selectedTab) {
+      case 'Notes':
+        return <Typography>{topicData.notes || 'No notes available for this topic.'}</Typography>;
+
+      case 'Watch Video':
+        return topicData.youtubeLinks?.length > 0 ? (
+          topicData.youtubeLinks.map((link, idx) => (
+            <div key={idx} className="mb-6">
+              <iframe
+                src={link}
+                title={`Video ${idx + 1}`}
+                className="w-full h-64 rounded"
+                allowFullScreen
+              ></iframe>
+            </div>
+          ))
+        ) : (
+          <Typography>No videos available for this topic.</Typography>
+        );
+
+      case 'Quiz': {
+        const questions = quizData?.[0]?.questions || [];
+        return (
+          <>
+            {questions.length > 0 ? (
+              <>
+                {questions.map((q, idx) => (
+                  <QuizQuestion
+                    key={idx}
+                    questionIndex={idx}
+                    questionData={q}
+                    selectedOptions={selectedOptions}
+                    handleOptionChange={handleOptionChange}
+                    isSubmitted={isSubmitted}
+                  />
+                ))}
+
+                {!isSubmitted ? (
+                  <button
+                    onClick={handleSubmitQuiz}
+                    className="bg-blue-600 text-white px-4 py-2 rounded mt-4 hover:bg-blue-700 transition"
+                  >
+                    Submit Quiz
+                  </button>
+                ) : (
+                  <>
+                    <Typography variant="h6" className="mt-4">
+                      You scored {score} out of {questions.length}
+                    </Typography>
+                    {isTopicCompleted && (
+                      <Typography color="green" className="mt-2">
+                        ✅ Topic marked as completed!
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <Typography>No quiz questions for this topic.</Typography>
+            )}
+          </>
+        );
+      }
+
+      case 'Coding Practice':
+        return topicData.codingQuestions?.length > 0 ? (
+          topicData.codingQuestions.map((q, idx) => (
+            <Card key={idx} className="p-4 mb-4">
+              <Typography variant="h6">{q.title}</Typography>
+              <Typography>{q.description}</Typography>
+            </Card>
+          ))
+        ) : (
+          <Typography>No coding practice available.</Typography>
+        );
+
+      case 'Feedback':
+        return feedbackData.length > 0 ? (
+          feedbackData.map((fb, idx) => (
+            <Card key={idx} className="p-4 mb-4">
+              <Typography variant="small" className="font-semibold">
+                Rating: <Rating value={fb.rating} readonly />
+              </Typography>
+              <Typography className="mt-2">{fb.comment}</Typography>
+            </Card>
+          ))
+        ) : (
+          <Typography>No feedback available for this topic.</Typography>
+        );
+
+      case 'AI Assistance':
+        return (
+          <>
+            <Typography variant="small" className="mb-2 font-medium text-gray-700">
+              AI Response:
+            </Typography>
+            <Card className="p-4 bg-gray-100 whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto">
+              {response || 'AI response will appear here.'}
+            </Card>
+            <Typography variant="small" className="mb-2 font-medium text-gray-700 mt-4">
+              Ask your question about this topic:
+            </Typography>
+            <div className="flex items-start gap-4">
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={4}
+                className="flex-grow"
+              />
+              <Button
+                onClick={handleAIRequest}
+                disabled={aiLoading || !prompt.trim()}
+                className="rounded-full bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0"
+                aria-label="Submit AI prompt"
+              >
+                {aiLoading ? (
+                  <Spinner className="h-6 w-6" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-7 7l7-7 7 7" />
+                  </svg>
+                )}
+              </Button>
+            </div>
+          </>
+        );
+
+      default:
+        return <Typography>Select a tab to view its content.</Typography>;
     }
   };
 
   return (
     <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-gray-50">
-      {/* Sidebar */}
       <div className="w-full md:w-1/4 bg-white shadow-lg rounded p-4">
         <Typography variant="h6" className="mb-4 capitalize">
           {language ? `${language} - ${topic}` : topic}
@@ -90,63 +322,11 @@ const CourseDetail = () => {
           ))}
         </List>
       </div>
-
-      {/* Content Area */}
       <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6 overflow-y-auto">
-        <Typography variant="h6" className="mb-4 text-blue-700">
+        <Typography variant="h6" className="mb-4 text-blue-800">
           {selectedTab}
         </Typography>
-
-       {selectedTab === 'AI Assistance' ? (
-  <>
-    <Typography variant="small" className="mb-2 font-medium text-gray-700">
-      AI Response:
-    </Typography>
-    <Card className="p-4 bg-gray-100 whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto">
-  {response || 'AI response will appear here.'}
-</Card>
-
-    <Typography variant="small" className="mb-2 font-medium text-gray-700">
-      Ask your question about this topic:
-    </Typography>
-
-    <div className="flex items-start gap-4">
-      <Textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        rows={4}
-      
-        className="flex-grow"
-      />
-      <Button
-        onClick={handleAIRequest}
-        disabled={loading || !prompt.trim()}
-        className="rounded-full bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0"
-        aria-label="Submit AI prompt"
-      >
-        {loading ? (
-          <Spinner className="h-6 w-6" />
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-7 7l7-7 7 7" />
-          </svg>
-        )}
-      </Button>
-    </div>
-  </>
-) : (
-  <Typography>
-    {dummyContent[selectedTab] || 'Content for this tab will appear here soon.'}
-  </Typography>
-)}
-
+        {renderContent()}
       </div>
     </div>
   );
