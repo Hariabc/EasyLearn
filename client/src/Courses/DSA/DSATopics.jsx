@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardBody, Typography, Progress } from '@material-tailwind/react';
 import { AuthContext } from '../../context/AuthContext';
 
-const LanguageTopics = () => {
+const DSATopics = () => {
   const { languageId } = useParams();
   const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
@@ -35,6 +35,7 @@ const LanguageTopics = () => {
         if (!userRes.ok) throw new Error('Failed to fetch user progress');
         const userData = await userRes.json();
 
+        // Match progress for the specific language
         const course = userData.enrolledCourses.find(c =>
           c.languages?.some(lang =>
             typeof lang.language === 'string'
@@ -63,7 +64,7 @@ const LanguageTopics = () => {
 
   const handleTopicClick = (topic) => {
     const topicParam = topic.title.toLowerCase().replace(/\s+/g, '-');
-    navigate(`/courses/computerlanguages/${languageId}/${topicParam}?topicId=${topic._id}`);
+    navigate(`/courses/dsa/${languageId}/${topicParam}?topicId=${topic._id}`);
   };
 
   if (loading) return <div className="p-8">Loading topics...</div>;
@@ -109,4 +110,4 @@ const LanguageTopics = () => {
   );
 };
 
-export default LanguageTopics;
+export default DSATopics;

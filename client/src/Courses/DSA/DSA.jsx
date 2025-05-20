@@ -3,7 +3,7 @@ import { Card, CardHeader, CardBody, Typography, Progress } from '@material-tail
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
-const Backend = () => {
+const DSA = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const courseId = searchParams.get('id');
@@ -13,14 +13,12 @@ const Backend = () => {
   const [error, setError] = useState(null);
   const { user, authToken } = useContext(AuthContext);
 
-  // Fetch backend languages for the course
   const fetchLanguages = async () => {
     const res = await fetch(`http://localhost:5000/api/languages/${courseId}`);
     if (!res.ok) throw new Error('Failed to fetch languages');
     return await res.json();
   };
 
-  // Fetch user progress data
   const fetchUserProgress = async () => {
     const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -45,18 +43,17 @@ const Backend = () => {
         setLoading(false);
       }
     };
-
     if (courseId && user && authToken) {
       fetchData();
     }
   }, [courseId, user, authToken]);
 
   const handleClick = (languageId) => {
-    navigate(`/courses/backend/${languageId}`);
+    navigate(`/courses/dsa/${languageId}`);
   };
 
-  if (loading) return <div className="p-8">Loading backend languages...</div>;
-  if (error) return <div className="p-8 text-red-600">Error: {error}</div>;
+  if (loading) return <div>Loading DSA languages...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   const totalLanguages = languages.length;
   const completedLanguages = userCourseProgress?.languages?.filter(lang =>
@@ -90,7 +87,7 @@ const Backend = () => {
               </CardHeader>
               <CardBody>
                 <Typography variant="small" className="mb-2">
-                  Explore {name} programming language tutorials and resources.
+                  Explore {name} DSA topics and exercises.
                 </Typography>
                 <div className="mt-2">
                   <Progress value={percent} color={percent === 100 ? "green" : "blue"} />
@@ -107,4 +104,4 @@ const Backend = () => {
   );
 };
 
-export default Backend;
+export default DSA;

@@ -3,6 +3,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const topicRoutes = require('./routes/topicRoutes');
+const languageRoutes = require('./routes/languageRoutes');
+const quizRoutes = require('./routes/quizRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+
+
+
+
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +24,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
 
 // CORS setup — add your frontend URL here
 app.use(cors({
@@ -30,6 +41,15 @@ app.get('/api/test', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/topics', topicRoutes);
+app.use('/api/languages', languageRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/feedbacks', feedbackRoutes);
+
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
