@@ -3,10 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { IconButton, Button } from '@material-tailwind/react';
 import { SunIcon, PowerIcon } from '@heroicons/react/24/solid';
+import { Button } from '@material-tailwind/react';
+import { SunIcon, PowerIcon, Bars3Icon, XMarkIcon, AcademicCapIcon, ClipboardDocumentListIcon, TrophyIcon, StarIcon, ChatBubbleLeftRightIcon, Squares2X2Icon, Cog6ToothIcon } from '@heroicons/react/24/solid';
+import logo from "../assets/education_10353866.png"
+
+const navItems = [
+  { icon: <Squares2X2Icon className="h-6 w-6" />, text: 'Dashboard' },
+  { icon: <AcademicCapIcon className="h-6 w-6" />, text: 'My Courses' },
+  { icon: <ClipboardDocumentListIcon className="h-6 w-6" />, text: 'Quizzes' },
+  { icon: <TrophyIcon className="h-6 w-6" />, text: 'Contests' },
+  { icon: <StarIcon className="h-6 w-6" />, text: 'Rewards' },
+  { icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />, text: 'Discussion Forum' },
+];
 
 const Dashboard = () => {
   const { user, loading, logout, authToken } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -74,11 +96,15 @@ const Dashboard = () => {
       console.error('Error enrolling in course:', error);
     }
   };
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   console.log(enrolledCourses);
   const handleCourseView = (course) => {
     navigate(`/courses/${course.slug}?id=${course._id}`);
   };
+ 
 
   const availableCourses = courses.filter(course =>
     !enrolledCourses.some(enrolled => enrolled.course._id === course._id)
@@ -99,6 +125,39 @@ const Dashboard = () => {
           <a href="#" className="block text-gray-700 hover:text-blue-600">Contests</a>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Rewards</a>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Discussion Forum</a>
+        </nav>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+          <span className={`text-xl font-semibold tracking-tight text-gray-900 ${!isSidebarOpen && 'lg:hidden'}`}>EasyLearn</span>
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
+            aria-label="Toggle sidebar"
+          >
+            {isSidebarOpen ? (
+              <XMarkIcon className="h-6 w-6 text-gray-700" />
+            ) : (
+              <Bars3Icon className="h-6 w-6 text-gray-700" />
+            )}
+          </button>
+        </div>
+        <nav className="flex-1 px-2 py-4 space-y-1 bg-white">
+          {navItems.map((item, index) => (
+            <a 
+              key={index}
+              href="#" 
+              className={`
+                group flex items-center gap-4 rounded-lg px-3 py-3 my-1
+                text-gray-700 font-medium transition
+                hover:bg-blue-50 hover:text-blue-600
+                ${!isSidebarOpen && 'lg:justify-center px-0'}
+              `}
+            >
+              <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-500">
+                {item.icon}
+              </span>
+              <span className={`truncate ${!isSidebarOpen && 'lg:hidden'}`}>{item.text}</span>
+            </a>
+          ))}
         </nav>
       </aside>
 
@@ -178,7 +237,6 @@ const Dashboard = () => {
               ))}
             </div>
           </section>
-
           {/* Available Courses */}
           <section className="bg-white p-6 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-4">Available Courses</h3>
@@ -201,15 +259,11 @@ const Dashboard = () => {
                       Enroll
                     </button>
                   </div>
-                </div>
+                  </div>
+                      
               ))}
             </div>
           </section>
-
-          {/* Footer */}
-          <footer className="mt-auto bg-gray-800 text-white p-4 text-center">
-            <p>&copy; 2025 EasyLearn. All rights reserved.</p>
-          </footer>
         </main>
       </div>
     </div>
