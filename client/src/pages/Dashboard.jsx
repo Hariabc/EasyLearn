@@ -190,7 +190,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <button onClick={() => handleCourseView(course.course)} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                  <button onClick={() => handleCourseView(course)} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                     Continue Course
                   </button>
                 </div>
