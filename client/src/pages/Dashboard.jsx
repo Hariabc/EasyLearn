@@ -91,9 +91,11 @@ const Dashboard = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleCourseView = (course) => {
-    navigate(`/courses/${course.slug}?id=${course._id}`);
-  };
+ const handleCourseView = (courseWrapper) => {
+  const course = courseWrapper.course;
+  navigate(`/courses/${course.slug}?id=${course._id}`);
+};
+
 
   const availableCourses = courses.filter(course =>
     !enrolledCourses.some(enrolled => enrolled.course._id === course._id)
