@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   List,
@@ -8,33 +8,33 @@ import {
   Button,
   Spinner,
   Rating,
-} from '@material-tailwind/react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import QuizQuestion from '../components/QuizComponent';
-import { AuthContext } from '../context/AuthContext';
+} from "@material-tailwind/react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import QuizQuestion from "../components/QuizComponent";
+import { AuthContext } from "../context/AuthContext";
 import api from "../axios";
 
 const tabs = [
-  'Notes',
-  'Watch Video',
-  'Quiz',
-  'Coding Practice',
-  'Feedback',
-  'AI Assistance',
+  "Notes",
+  "Watch Video",
+  "Quiz",
+  "Coding Practice",
+  "Feedback",
+  "AI Assistance",
 ];
 
 const CourseDetail = () => {
   const { language, topic } = useParams();
   const [searchParams] = useSearchParams();
-  const topicId = searchParams.get('topicId');
+  const topicId = searchParams.get("topicId");
   const navigate = useNavigate();
   const { user, authToken } = React.useContext(AuthContext);
 
-  const [courseId, setCourseId] = useState('');
-  const [languageId, setLanguageId] = useState('');
-  const [selectedTab, setSelectedTab] = useState('Notes');
-  const [prompt, setPrompt] = useState('');
-  const [response, setResponse] = useState('');
+  const [courseId, setCourseId] = useState("");
+  const [languageId, setLanguageId] = useState("");
+  const [selectedTab, setSelectedTab] = useState("Notes");
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
   const [aiLoading, setaiLoading] = useState(false);
   const [dataLoading, setdataLoading] = useState(true);
   const [topicData, setTopicData] = useState(null);
@@ -66,7 +66,7 @@ const CourseDetail = () => {
         const res = await api.get(`/api/quizzes/${topicId}`);
         setQuizData(res.data);
       } catch (err) {
-        console.error('Quiz fetch error:', err);
+        console.error("Quiz fetch error:", err);
       }
     };
 
@@ -75,7 +75,7 @@ const CourseDetail = () => {
         const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
         setFeedbackData(res.data);
       } catch (err) {
-        console.error('Feedback fetch error:', err);
+        console.error("Feedback fetch error:", err);
       }
     };
 
@@ -89,30 +89,33 @@ const CourseDetail = () => {
   const handleAIRequest = async () => {
     if (!prompt.trim()) return;
     setaiLoading(true);
-    setResponse('');
+    setResponse("");
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
         }
       );
       const data = await res.json();
       const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      setResponse(aiText || 'No response generated from Gemini.');
+      setResponse(aiText || "No response generated from Gemini.");
     } catch (error) {
-      console.error('AI error:', error);
-      setResponse('An error occurred while fetching AI response.');
+      console.error("AI error:", error);
+      setResponse("An error occurred while fetching AI response.");
     } finally {
       setaiLoading(false);
     }
   };
 
   const handleOptionChange = (questionIndex, selectedOption) => {
-    setSelectedOptions((prev) => ({ ...prev, [questionIndex]: selectedOption }));
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [questionIndex]: selectedOption,
+    }));
   };
 
   const handleSubmitQuiz = async () => {
@@ -126,20 +129,24 @@ const CourseDetail = () => {
 
     if (newScore === questions.length) {
       try {
-        const res = await api.post(`/api/users/markComplete`, {
-          courseId,
-          languageId,
-          topicId,
-        });
+        const res = await api.post(
+          `/api/users/markComplete`,
+          { courseId, languageId, topicId },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
 
         if (res.status === 200) {
           setIsTopicCompleted(true);
-          console.log('Topic marked as completed:', res.data);
+          console.log("Topic marked as completed:", res.data);
         } else {
-          console.error('Failed to mark topic as complete:', res.data);
+          console.error("Failed to mark topic as complete:", res.data);
         }
       } catch (err) {
-        console.error('Error marking topic as complete:', err);
+        console.error("Error marking topic as complete:", err);
       }
     }
   };
@@ -149,10 +156,14 @@ const CourseDetail = () => {
     if (dataLoading) return <Typography>Loading topic data...</Typography>;
 
     switch (selectedTab) {
-      case 'Notes':
-        return <Typography>{topicData.notes || 'No notes available for this topic.'}</Typography>;
+      case "Notes":
+        return (
+          <Typography>
+            {topicData.notes || "No notes available for this topic."}
+          </Typography>
+        );
 
-      case 'Watch Video':
+      case "Watch Video":
         return topicData.youtubeLinks?.length > 0 ? (
           topicData.youtubeLinks.map((link, idx) => (
             <div key={idx} className="mb-6">
@@ -168,7 +179,7 @@ const CourseDetail = () => {
           <Typography>No videos available for this topic.</Typography>
         );
 
-      case 'Quiz': {
+      case "Quiz": {
         const questions = quizData?.[0]?.questions || [];
         return (
           <>
@@ -204,7 +215,9 @@ const CourseDetail = () => {
                         </Typography>
                         <Button
                           className="mt-4 bg-blue-700 text-white"
-                          onClick={() => navigate(`/courses/frontend/${languageId}`)}
+                          onClick={() =>
+                            navigate(`/courses/frontend/${languageId}`)
+                          }
                         >
                           Back to Topics
                         </Button>
@@ -220,7 +233,7 @@ const CourseDetail = () => {
         );
       }
 
-      case 'Coding Practice':
+      case "Coding Practice":
         return topicData.codingQuestions?.length > 0 ? (
           topicData.codingQuestions.map((q, idx) => (
             <Card key={idx} className="p-4 mb-4">
@@ -232,7 +245,7 @@ const CourseDetail = () => {
           <Typography>No coding practice available.</Typography>
         );
 
-      case 'Feedback':
+      case "Feedback":
         return feedbackData.length > 0 ? (
           feedbackData.map((fb, idx) => (
             <Card key={idx} className="p-4 mb-4">
@@ -246,16 +259,22 @@ const CourseDetail = () => {
           <Typography>No feedback available for this topic.</Typography>
         );
 
-      case 'AI Assistance':
+      case "AI Assistance":
         return (
           <>
-            <Typography variant="small" className="mb-2 font-medium text-gray-700">
+            <Typography
+              variant="small"
+              className="mb-2 font-medium text-gray-700"
+            >
               AI Response:
             </Typography>
             <Card className="p-4 bg-gray-100 whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto">
-              {response || 'AI response will appear here.'}
+              {response || "AI response will appear here."}
             </Card>
-            <Typography variant="small" className="mb-2 font-medium text-gray-700 mt-4">
+            <Typography
+              variant="small"
+              className="mb-2 font-medium text-gray-700 mt-4"
+            >
               Ask your question about this topic:
             </Typography>
             <div className="flex items-start gap-4">
@@ -282,7 +301,11 @@ const CourseDetail = () => {
                     stroke="currentColor"
                     strokeWidth={2}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-7 7l7-7 7 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 19V5m-7 7l7-7 7 7"
+                    />
                   </svg>
                 )}
               </Button>
@@ -308,8 +331,8 @@ const CourseDetail = () => {
               onClick={() => setSelectedTab(tab)}
               className={`cursor-pointer rounded ${
                 selectedTab === tab
-                  ? 'bg-blue-100 font-semibold text-blue-700'
-                  : 'hover:bg-gray-100'
+                  ? "bg-blue-100 font-semibold text-blue-700"
+                  : "hover:bg-gray-100"
               }`}
             >
               {tab}
@@ -328,7 +351,6 @@ const CourseDetail = () => {
 };
 
 export default CourseDetail;
-
 
 // import React, { useState } from 'react';
 // import {
