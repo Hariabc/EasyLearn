@@ -1,5 +1,6 @@
 import React, { useContext , useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import api from '../axios';
 
 const MyCourses = () => {
   const { user , authToken} = useContext(AuthContext);
@@ -15,7 +16,7 @@ const MyCourses = () => {
 useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/enrolled-courses/${user._id}`, {
+        const response = await api.gey(`/api/users/enrolled-courses/${user._id}`, {
       headers: {
         'Authorization': `Bearer ${authToken}`,
       },

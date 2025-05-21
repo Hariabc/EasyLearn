@@ -9,9 +9,10 @@ import {
   Spinner,
   Rating,
 } from '@material-tailwind/react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import QuizQuestion from '../components/QuizComponent';
 import { AuthContext } from '../context/AuthContext';
+import api from "../axios";
 
 const tabs = [
   'Notes',
@@ -26,7 +27,9 @@ const CourseDetail = () => {
   const { language, topic } = useParams();
   const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topicId');
+  const navigate = useNavigate();
   const { user, authToken } = React.useContext(AuthContext);
+
   const [courseId, setCourseId] = useState('');
   const [languageId, setLanguageId] = useState('');
   const [selectedTab, setSelectedTab] = useState('Notes');
@@ -46,9 +49,8 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchTopicDetails = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/topics/topicById/${topicId}`);
-        if (!res.ok) throw new Error('Failed to load topic data.');
-        const data = await res.json();
+        const res = await api.get(`/api/topics/topicById/${topicId}`);
+        const data = res.data;
         setTopicData(data);
         setCourseId(data.course);
         setLanguageId(data.language);
@@ -61,11 +63,8 @@ const CourseDetail = () => {
 
     const fetchQuizData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/quizzes/${topicId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setQuizData(data);
-        }
+        const res = await api.get(`/api/quizzes/${topicId}`);
+        setQuizData(res.data);
       } catch (err) {
         console.error('Quiz fetch error:', err);
       }
@@ -73,11 +72,8 @@ const CourseDetail = () => {
 
     const fetchFeedbackData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/feedbacks/byTopic/${topicId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setFeedbackData(data);
-        }
+        const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
+        setFeedbackData(res.data);
       } catch (err) {
         console.error('Feedback fetch error:', err);
       }
@@ -119,7 +115,6 @@ const CourseDetail = () => {
     setSelectedOptions((prev) => ({ ...prev, [questionIndex]: selectedOption }));
   };
 
-
   const handleSubmitQuiz = async () => {
     const questions = quizData?.[0]?.questions || [];
     let newScore = 0;
@@ -131,25 +126,17 @@ const CourseDetail = () => {
 
     if (newScore === questions.length) {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/markComplete`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            courseId,
-            languageId,
-            topicId,
-          }),
+        const res = await api.post(`/api/users/markComplete`, {
+          courseId,
+          languageId,
+          topicId,
         });
 
-        const result = await res.json();
-        if (res.ok) {
+        if (res.status === 200) {
           setIsTopicCompleted(true);
-          console.log('Topic marked as completed:', result);
+          console.log('Topic marked as completed:', res.data);
         } else {
-          console.error('Failed to mark topic as complete:', result);
+          console.error('Failed to mark topic as complete:', res.data);
         }
       } catch (err) {
         console.error('Error marking topic as complete:', err);
@@ -211,9 +198,17 @@ const CourseDetail = () => {
                       You scored {score} out of {questions.length}
                     </Typography>
                     {isTopicCompleted && (
-                      <Typography color="green" className="mt-2">
-                        ✅ Topic marked as completed!
-                      </Typography>
+                      <>
+                        <Typography color="green" className="mt-2">
+                          ✅ Topic marked as completed!
+                        </Typography>
+                        <Button
+                          className="mt-4 bg-blue-700 text-white"
+                          onClick={() => navigate(`/courses/frontend/${languageId}`)}
+                        >
+                          Back to Topics
+                        </Button>
+                      </>
                     )}
                   </>
                 )}
@@ -333,6 +328,7 @@ const CourseDetail = () => {
 };
 
 export default CourseDetail;
+
 
 // import React, { useState } from 'react';
 // import {
