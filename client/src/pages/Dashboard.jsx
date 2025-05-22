@@ -19,7 +19,9 @@ import {
 } from "@heroicons/react/24/solid";
 import logo from "../assets/education_10353866.png";
 import api from "../axios";
-import { GlobeAltIcon } from "@heroicons/react/24/outline";
+import StreakDisplay from "../components/StreakDisplay";
+
+
 const navItems = [
   {
     icon: <Squares2X2Icon className="h-6 w-6" />,
@@ -410,6 +412,9 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <div className="mb-5">
+        <StreakDisplay/>
+        </div>
         {/* Mobile Header with Hamburger */}
         <div className="lg:hidden flex items-center mb-4">
           <button

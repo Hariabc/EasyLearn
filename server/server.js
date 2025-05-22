@@ -9,6 +9,7 @@ const topicRoutes = require('./routes/topicRoutes');
 const languageRoutes = require('./routes/languageRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const streakRoutes = require('./routes/streakRoutes');
 
 
 
@@ -47,6 +48,7 @@ app.use('/api/topics', topicRoutes);
 app.use('/api/languages', languageRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
+app.use('/api/streaks', streakRoutes);
 
 
 

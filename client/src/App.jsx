@@ -19,7 +19,7 @@ import Aptitude from "./Courses/Aptitude/Aptitude";
 import AptitudeTopics from "./Courses/Aptitude/AptitudeTopics";
 import DSATopics from "./Courses/DSA/DSATopics";
 import MyCourses from "./pages/MyCourses";
-
+import StreakDisplay from "./components/StreakDisplay";
 
 function App() {
   return <>
@@ -143,6 +143,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/streak" element={<StreakDisplay/>}/>
       </Routes>
     </Router>
   </>

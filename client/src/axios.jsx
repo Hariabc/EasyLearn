@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 const isLocalhost = window.location.hostname === 'localhost';
 
 const api = axios.create({

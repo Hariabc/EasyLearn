@@ -126,7 +126,7 @@ const CourseDetail = () => {
     });
     setScore(newScore);
     setIsSubmitted(true);
-
+    
     if (newScore === questions.length) {
       try {
         const res = await api.post(
@@ -320,7 +320,7 @@ const CourseDetail = () => {
 
   return (
     <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-gray-50">
-      <div className="w-full md:w-1/4 bg-white shadow-lg rounded p-4">
+      <div className="w-full md:w-1/4 bg-white shadow-lg rounded p-6">
         <Typography variant="h6" className="mb-4 capitalize">
           {language ? `${language} - ${topic}` : topic}
         </Typography>
@@ -329,7 +329,7 @@ const CourseDetail = () => {
             <ListItem
               key={tab}
               onClick={() => setSelectedTab(tab)}
-              className={`cursor-pointer rounded ${
+              className={`cursor-pointer rounded p-2 ${
                 selectedTab === tab
                   ? "bg-blue-100 font-semibold text-blue-700"
                   : "hover:bg-gray-100"
@@ -340,7 +340,7 @@ const CourseDetail = () => {
           ))}
         </List>
       </div>
-      <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6 overflow-y-auto">
+      <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6">
         <Typography variant="h6" className="mb-4 text-blue-800">
           {selectedTab}
         </Typography>
