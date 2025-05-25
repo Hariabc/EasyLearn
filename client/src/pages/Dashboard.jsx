@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { IconButton, Button } from '@material-tailwind/react';
 import { SunIcon, PowerIcon } from '@heroicons/react/24/solid';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, loading, logout, authToken } = useContext(AuthContext);
@@ -110,7 +111,9 @@ const Dashboard = () => {
           <button className="block text-left w-full text-gray-700 hover:text-blue-600">My Courses</button>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Quizzes</a>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Contests</a>
-          <a href="#" className="block text-gray-700 hover:text-blue-600">Rewards</a>
+         <Link to="/my-badges" className="block text-gray-700 hover:text-blue-600">
+  My Badges
+</Link>
           <a href="#" className="block text-gray-700 hover:text-blue-600">Discussion Forum</a>
         </nav>
       </aside>
