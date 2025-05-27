@@ -15,6 +15,10 @@ const streakRoutes = require('./routes/streakRoutes');
 
 
 
+
+
+
+
 // Load environment variables
 dotenv.config();
 
@@ -49,6 +53,7 @@ app.use('/api/languages', languageRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
 app.use('/api/streaks', streakRoutes);
+
 
 
 

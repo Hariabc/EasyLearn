@@ -50,6 +50,7 @@ const navItems = [
     path: "/forum",
   },
 ];
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, loading, logout, authToken } = useContext(AuthContext);
@@ -200,133 +201,20 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
-      <aside
-        className={`hidden lg:flex flex-col ${
-          isDesktopSidebarExpanded ? "w-64" : "w-20"
-        } bg-white shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div
-            className={`flex items-center ${
-              isDesktopSidebarExpanded
-                ? "justify-between px-6"
-                : "justify-center px-2"
-            } py-5 border-b border-gray-200`}
-          >
-            <div
-              className={`flex items-center ${
-                isDesktopSidebarExpanded ? "gap-3" : ""
-              }`}
-            >
-              <img
-                src={logo}
-                alt="EasyLearn Logo"
-                className={`${isDesktopSidebarExpanded ? "h-8" : "h-0"}`}
-              />
-              {isDesktopSidebarExpanded && (
-                <span className="text-xl font-semibold tracking-tight text-gray-900">
-                  EasyLearn
-                </span>
-              )}
-            </div>
-            <button
-              onClick={toggleDesktopSidebar}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none ${
-                !isDesktopSidebarExpanded ? "lg:mx-auto" : ""
-              }`}
-              aria-label="Toggle desktop sidebar"
-            >
-              {isDesktopSidebarExpanded ? (
-                <ChevronLeftIcon className="h-6 w-6 text-gray-700" />
-              ) : (
-                <ChevronRightIcon className="h-6 w-6 text-gray-700" />
-              )}
-            </button>
-          </div>
-          {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {navItems.map((item, index) => (
-              <a
-                key={index}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavigationClick(item.path);
-                }}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${
-                  !isDesktopSidebarExpanded ? "justify-center" : ""
-                }`}
-              >
-                <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-500">
-                  {item.icon}
-                </span>
-                {isDesktopSidebarExpanded && (
-                  <span className="truncate">{item.text}</span>
-                )}
-              </a>
-            ))}
-          </nav>
-          {/* User Section */}
-          <div className="py-4 border-t border-gray-200">
-            <div className="flex gap-2 flex-col">
-              {isDesktopSidebarExpanded ? (
-                <>
-                  <button
-                    onClick={handleProfileClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                  >
-                    <UserCircleIcon className="h-5 w-5" />
-                    Profile
-                  </button>
-                  <button
-                    onClick={handleSettingsClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                  >
-                    <Cog6ToothIcon className="h-5 w-5" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={handleLogoutClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-red-600 hover:bg-red-50"
-                  >
-                    <PowerIcon className="h-5 w-5" />
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <IconButton
-                    onClick={handleProfileClick}
-                    variant="text"
-                    color="blue"
-                    aria-label="Profile"
-                  >
-                    <UserCircleIcon className="h-6 w-6" />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleSettingsClick}
-                    variant="text"
-                    color="blue"
-                    aria-label="Settings"
-                  >
-                    <Cog6ToothIcon className="h-6 w-6" />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleLogoutClick}
-                    variant="text"
-                    color="red"
-                    aria-label="Logout"
-                  >
-                    <PowerIcon className="h-6 w-6" />
-                  </IconButton>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white shadow-md">
+        <div className="p-6 font-bold text-lg border-b">EasyLearn</div>
+        <nav className="p-4 space-y-4">
+          <a href="#" className="block text-gray-700 hover:text-blue-600">Dashboard</a>
+          <button className="block text-left w-full text-gray-700 hover:text-blue-600">My Courses</button>
+          <a href="#" className="block text-gray-700 hover:text-blue-600">Quizzes</a>
+          <a href="#" className="block text-gray-700 hover:text-blue-600">Contests</a>
+         <Link to="/my-badges" className="block text-gray-700 hover:text-blue-600">
+  My Badges
+</Link>
+          <a href="#" className="block text-gray-700 hover:text-blue-600">Discussion Forum</a>
+        </nav>
       </aside>
 
       {/* Mobile Sidebar Overlay */}

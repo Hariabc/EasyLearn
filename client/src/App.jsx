@@ -19,6 +19,7 @@ import Aptitude from "./Courses/Aptitude/Aptitude";
 import AptitudeTopics from "./Courses/Aptitude/AptitudeTopics";
 import DSATopics from "./Courses/DSA/DSATopics";
 import MyCourses from "./pages/MyCourses";
+import BadgeComponent from "./components/BadgeCard";
 import StreakDisplay from "./components/StreakDisplay";
 
 function App() {
@@ -40,19 +41,31 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/my-badges" element={
+            <ProtectedRoute>
+              <BadgeComponent/>
+            </ProtectedRoute>
+          } />
 
 
-          <Route path="/courses/computerlanguages" element={
+        <Route path="/courses" element={
+          <ProtectedRoute>
+            <CoursesPage />
+          </ProtectedRoute>} />
+
+
+
+          <Route path="/courses/computer-programming" element={
             <ProtectedRoute>
               <ComputerLanguages />
             </ProtectedRoute>
           } />
-          <Route path="/courses/computerlanguages/:languageId" element={
+          <Route path="/courses/computer-programming/:languageId" element={
             <ProtectedRoute>
               <LanguageTopics/>
             </ProtectedRoute>
           } />
-          <Route path="/courses/computerlanguages/:languageId/:topic" element={
+          <Route path="/courses/computer-programming/:languageId/:topic" element={
             <ProtectedRoute>
               <CourseDetail />
               </ProtectedRoute>
