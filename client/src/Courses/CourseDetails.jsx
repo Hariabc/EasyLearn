@@ -129,11 +129,12 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
   try {
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    const referer = window.location.origin;
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": "http://localhost:5173", // Change this to your site if deployed
+        "HTTP-Referer": referer,
         "X-Title": "EduQuiz AI Notes Generator",
         "Content-Type": "application/json"
       },
@@ -185,12 +186,13 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
   try {
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    const referer = window.location.origin;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": "http://localhost:5173", // Change this for production
+        "HTTP-Referer": referer,
         "X-Title": "EduQuiz AI Quiz Generator",
         "Content-Type": "application/json",
       },
@@ -268,14 +270,16 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
   if (newScore === questions.length) {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/markComplete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ courseId, languageId, topicId }),
-      });
+      const res = await api.post(`/api/users/markComplete`, {
+  courseId,
+  languageId,
+  topicId
+}, {
+  headers: {
+    Authorization: `Bearer ${authToken}`,
+  }
+});
+
 
       const result = await res.json();
       if (res.ok) {
