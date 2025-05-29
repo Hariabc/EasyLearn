@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
+import api from "../axios";
 
 const BadgeCard = ({ badge }) => (
   <motion.div
@@ -36,7 +37,7 @@ const BadgeComponent = () => {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get("http://localhost:5000/api/users/me/badges", {
+        const res = await api.get("/api/users/me/badges", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
