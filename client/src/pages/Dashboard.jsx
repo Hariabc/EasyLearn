@@ -43,7 +43,7 @@ const navItems = [
     text: "Contests",
     path: "/contests",
   },
-  { icon: <StarIcon className="h-6 w-6" />, text: "Rewards", path: "/my-badges" },
+  { icon: <StarIcon className="h-6 w-6" />, text: "My Badges", path: "/my-badges" },
   {
     icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />,
     text: "Discussion Forum",
