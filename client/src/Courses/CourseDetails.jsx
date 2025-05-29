@@ -445,7 +445,7 @@ case 'Quiz': {
           ))}
         </List>
       </div>
-      <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6 overflow-y-auto">
+      <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6">
         <Typography variant="h6" className="mb-4 text-blue-800">{selectedTab}</Typography>
         {renderContent()}
       </div>
