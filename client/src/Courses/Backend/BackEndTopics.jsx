@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardBody, Typography, Progress } from '@material-tailwind/react';
 import { AuthContext } from '../../context/AuthContext';
+import api from '../../axios';
+
 
 const BackEndTopics = () => {
   const { languageId } = useParams();
@@ -21,19 +23,18 @@ const BackEndTopics = () => {
         setError(null);
 
         // Fetch topics
-        const topicsRes = await fetch(`http://localhost:5000/api/topics/${languageId}`);
-        if (!topicsRes.ok) throw new Error('Failed to fetch topics');
-        const topicsData = await topicsRes.json();
-        setTopics(topicsData);
+        const topicsRes = await api.get(`/api/topics/${languageId}`);
+        
+        setTopics(topicsRes.data);
 
         // Fetch user progress
-        const userRes = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+        const userRes = await api.get(`/api/users/${user._id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        if (!userRes.ok) throw new Error('Failed to fetch user progress');
-        const userData = await userRes.json();
+        
+        const userData = userRes.data;
 
         // Match language progress correctly
         const course = userData.enrolledCourses.find(c =>

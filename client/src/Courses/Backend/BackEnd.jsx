@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Card, CardHeader, CardBody, Typography, Progress } from '@material-tailwind/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import api from '../../axios';
 
 const Backend = () => {
   const navigate = useNavigate();
@@ -15,18 +16,18 @@ const Backend = () => {
 
   // Fetch backend languages for the course
   const fetchLanguages = async () => {
-    const res = await fetch(`http://localhost:5000/api/languages/${courseId}`);
-    if (!res.ok) throw new Error('Failed to fetch languages');
-    return await res.json();
+    const res = await api.get(`/api/languages/${courseId}`);
+    
+    return res.data;
   };
 
   // Fetch user progress data
   const fetchUserProgress = async () => {
-    const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+    const res = await api.get(`/api/users/${user._id}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
-    if (!res.ok) throw new Error('Failed to fetch user progress');
-    const data = await res.json();
+    
+    const data = res.data;
     const progress = data.enrolledCourses.find(c => c.course._id === courseId);
     return progress || null;
   };

@@ -55,17 +55,17 @@ function App() {
 
 
 
-          <Route path="/courses/computer-programming" element={
+          <Route path="/courses/computerlanguages" element={
             <ProtectedRoute>
               <ComputerLanguages />
             </ProtectedRoute>
           } />
-          <Route path="/courses/computer-programming/:languageId" element={
+          <Route path="/courses/computerlanguages/:languageId" element={
             <ProtectedRoute>
               <LanguageTopics/>
             </ProtectedRoute>
           } />
-          <Route path="/courses/computer-programming/:languageId/:topic" element={
+          <Route path="/courses/computerlanguages/:languageId/:topic" element={
             <ProtectedRoute>
               <CourseDetail />
               </ProtectedRoute>
