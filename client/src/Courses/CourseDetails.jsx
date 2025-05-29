@@ -297,8 +297,13 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
 
   const renderContent = () => {
-    if (fetchError) return <Typography color="red">{fetchError}</Typography>;
-    if (dataLoading) return <Typography>Loading topic data...</Typography>;
+    if (fetchError) {
+      return <Typography className="text-red-600">{fetchError}</Typography>;
+    }
+
+    if (dataLoading) {
+      return <Typography>Loading topic data...</Typography>;
+    }
 
     switch (selectedTab) {
       case 'Notes':
@@ -307,116 +312,146 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
             {aiNotesLoading ? (
               <Typography>Generating AI Notes...</Typography>
             ) : (
-              <Typography className="whitespace-pre-wrap">{aiNotesResponse || topicData.notes}</Typography>
+              <Typography className="whitespace-pre-wrap">
+                {aiNotesResponse || topicData.notes}
+              </Typography>
             )}
-            <Button onClick={generateAINotes} disabled={aiNotesLoading} className="mt-4">
+            <Button
+              onClick={generateAINotes}
+              disabled={aiNotesLoading}
+              className="mt-4"
+            >
               Regenerate AI Notes
             </Button>
           </div>
         );
 
-      case "Watch Video":
+      case 'Watch Video':
         return topicData.youtubeLinks?.length > 0 ? (
           topicData.youtubeLinks.map((link, idx) => (
             <div key={idx} className="mb-6">
-              <iframe src={link} title={`Video ${idx + 1}`} className="w-full h-64 rounded" allowFullScreen></iframe>
+              <iframe
+                src={link}
+                title={`Video ${idx + 1}`}
+                className="w-full h-64 rounded shadow"
+                allowFullScreen
+              ></iframe>
             </div>
           ))
         ) : (
           <Typography>No videos available for this topic.</Typography>
         );
 
-case 'Quiz': {
-  const questions = aiQuizQuestions;
+      case 'Quiz':
+        return (
+          <>
+            {aiQuizLoading ? (
+              <Typography>Generating Quiz Questions...</Typography>
+            ) : aiQuizQuestions.length > 0 ? (
+              <>
+                {aiQuizQuestions.map((q, idx) => (
+                  <QuizQuestion
+                    key={idx}
+                    questionIndex={idx}
+                    questionData={q}
+                    selectedOptions={selectedOptions}
+                    handleOptionChange={handleOptionChange}
+                    isSubmitted={isSubmitted}
+                  />
+                ))}
+                {!isSubmitted ? (
+                  <Button
+                    onClick={handleSubmitQuiz}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Submit Quiz
+                  </Button>
+                ) : (
+                  <>
+                    <Typography variant="h6" className="mt-4">
+                      You scored {score} out of {aiQuizQuestions.length}
+                    </Typography>
+                    {isTopicCompleted && (
+                      <Typography className="mt-2 text-green-600">
+                        ✅ Topic marked as completed!
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <Typography>No quiz questions generated yet.</Typography>
+            )}
+          </>
+        );
 
-  return (
-    <>
-      {aiQuizLoading ? (
-        <Typography>Generating Quiz Questions...</Typography>
-      ) : questions.length > 0 ? (
-        <>
-          {questions.map((q, idx) => (
-            <QuizQuestion
-              key={idx}
-              questionIndex={idx}
-              questionData={q}
-              selectedOptions={selectedOptions}
-              handleOptionChange={handleOptionChange}
-              isSubmitted={isSubmitted}
-            />
-          ))}
-
-          {!isSubmitted ? (
-            <button
-              onClick={handleSubmitQuiz}
-              className="bg-blue-600 text-white px-4 py-2 rounded mt-4 hover:bg-blue-700 transition"
-            >
-              Submit Quiz
-            </button>
-          ) : (
-            <>
-              <Typography variant="h6" className="mt-4">
-                You scored {score} out of {questions.length}
-              </Typography>
-              {isTopicCompleted && (
-                <Typography color="green" className="mt-2">
-                  ✅ Topic marked as completed!
-                </Typography>
-              )}
-            </>
-          )}
-        </>
-      ) : (
-        <Typography>No quiz questions generated yet.</Typography>
-      )}
-    </>
-  );
-}
-
-
-      case "Coding Practice":
+      case 'Coding Practice':
         return topicData.codingQuestions?.length > 0 ? (
           topicData.codingQuestions.map((q, idx) => (
-            <Card key={idx} className="p-4 mb-4">
+            <Card key={idx} className="p-4 mb-4 shadow">
               <Typography variant="h6">{q.title}</Typography>
-              <Typography>{q.description}</Typography>
+              <Typography className="mt-2 text-gray-700">{q.description}</Typography>
             </Card>
           ))
         ) : (
           <Typography>No coding practice available.</Typography>
         );
 
-      case "Feedback":
+      case 'Feedback':
         return feedbackData.length > 0 ? (
           feedbackData.map((fb, idx) => (
-            <Card key={idx} className="p-4 mb-4">
-              <Typography variant="small" className="font-semibold">Rating: <Rating value={fb.rating} readonly /></Typography>
-              <Typography className="mt-2">{fb.comment}</Typography>
+            <Card key={idx} className="p-4 mb-4 shadow">
+              <Typography className="text-sm font-semibold">
+                Rating: <Rating value={fb.rating} readonly />
+              </Typography>
+              <Typography className="mt-2 text-gray-700">{fb.comment}</Typography>
             </Card>
           ))
         ) : (
           <Typography>No feedback available for this topic.</Typography>
         );
 
-      case "AI Assistance":
+      case 'AI Assistance':
         return (
           <>
-            <Typography variant="small" className="mb-2 font-medium text-gray-700">AI Response:</Typography>
+            <Typography className="mb-2 font-medium text-gray-700 text-sm">
+              AI Response:
+            </Typography>
             <Card className="p-4 bg-gray-100 whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto">
-              {response || "AI response will appear here."}
+              {response || 'AI response will appear here.'}
             </Card>
-            <Typography variant="small" className="mb-2 font-medium text-gray-700 mt-4">Ask your question about this topic:</Typography>
+            <Typography className="mb-2 font-medium text-gray-700 mt-4 text-sm">
+              Ask your question about this topic:
+            </Typography>
             <div className="flex items-start gap-4">
-              <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={4} className="flex-grow" />
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={4}
+                className="flex-grow"
+              />
               <Button
                 onClick={handleAIRequest}
                 disabled={aiLoading || !prompt.trim()}
                 className="rounded-full bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0"
                 aria-label="Submit AI prompt"
               >
-                {aiLoading ? <Spinner className="h-6 w-6" /> : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-7 7l7-7 7 7" />
+                {aiLoading ? (
+                  <Spinner className="h-6 w-6" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 19V5m-7 7l7-7 7 7"
+                    />
                   </svg>
                 )}
               </Button>
@@ -431,22 +466,33 @@ case 'Quiz': {
 
   return (
     <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-gray-50">
+      {/* Sidebar */}
       <div className="w-full md:w-1/4 bg-white shadow-lg rounded p-4">
-        <Typography variant="h6" className="mb-4 capitalize">{language ? `${language} - ${topic}` : topic}</Typography>
+        <Typography variant="h6" className="mb-4 capitalize">
+          {language ? `${language} - ${topic}` : topic}
+        </Typography>
         <List>
           {tabs.map((tab) => (
             <ListItem
               key={tab}
               onClick={() => setSelectedTab(tab)}
-              className={`cursor-pointer rounded ${selectedTab === tab ? 'bg-blue-100 font-semibold text-blue-700' : 'hover:bg-gray-100'}`}
+              className={`cursor-pointer rounded px-3 py-2 ${
+                selectedTab === tab
+                  ? 'bg-blue-100 font-semibold text-blue-700'
+                  : 'hover:bg-gray-100'
+              }`}
             >
               {tab}
             </ListItem>
           ))}
         </List>
       </div>
+
+      {/* Main Content */}
       <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6">
-        <Typography variant="h6" className="mb-4 text-blue-800">{selectedTab}</Typography>
+        <Typography variant="h6" className="mb-4 text-blue-800">
+          {selectedTab}
+        </Typography>
         {renderContent()}
       </div>
     </div>
