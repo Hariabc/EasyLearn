@@ -127,7 +127,7 @@ const Dashboard = () => {
         setEnrolledCourses([]);
         setCoursesLoading(false);
       }
-    }, 1000); // Delay before fetching
+    }, 500); // Delay before fetching
 
     return () => clearTimeout(timeoutId);
   }, [user, authToken]);
