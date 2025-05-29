@@ -239,59 +239,57 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 };
 
   const handleOptionChange = (questionIndex, selectedOption) => {
-  setSelectedOptions((prev) => ({
-    ...prev,
-    [questionIndex]: selectedOption,
-  }));
-};
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [questionIndex]: selectedOption.trim().toLowerCase()
+    }));
+  };
 
 
   const handleSubmitQuiz = async () => {
-  const questions = aiQuizQuestions || [];
-  let newScore = 0;
+    const questions = aiQuizQuestions || [];
+    let newScore = 0;
 
-  questions.forEach((q, idx) => {
-    const selected = (selectedOptions[idx] || '').toString().trim().toUpperCase();
-    let correct = (q.correctAnswer || '').toString().trim().toUpperCase();
+    questions.forEach((q, idx) => {
+      const selected = (selectedOptions[idx] || '').toString().trim().toLowerCase();
+      let correct = (q.correctAnswer || '').toString().trim().toLowerCase();
 
-    // If correct is a letter like "A", map it to actual option
-    if (correct.length === 1 && correct >= 'A' && correct <= 'Z') {
-      const optionIdx = correct.charCodeAt(0) - 65;
-      correct = q.options?.[optionIdx]?.trim().toUpperCase() || '';
-    }
-
-    if (selected === correct) {
-      newScore++;
-    }
-  });
-
-  setScore(newScore);
-  setIsSubmitted(true);
-
-  if (newScore === questions.length) {
-    try {
-      const res = await api.post(`/api/users/markComplete`, {
-  courseId,
-  languageId,
-  topicId
-}, {
-  headers: {
-    Authorization: `Bearer ${authToken}`,
-  }
-});
-
-
-      const result = await res.json();
-      if (res.ok) {
-        setIsTopicCompleted(true);
-      } else {
-        console.error('Failed to mark topic as complete:', result);
+      // If correct is a letter like "A", map it to actual option
+      if (correct.length === 1 && correct >= 'a' && correct <= 'z') {
+        const optionIdx = correct.charCodeAt(0) - 97; // Use lowercase 'a' (97) instead of 'A' (65)
+        correct = q.options?.[optionIdx]?.trim().toLowerCase() || '';
       }
-    } catch (err) {
-      console.error('Error marking topic as complete:', err);
+
+      if (selected === correct) {
+        newScore++;
+      }
+    });
+
+    setScore(newScore);
+    setIsSubmitted(true);
+
+    if (newScore === questions.length) {
+      try {
+        const res = await api.post(`/api/users/markComplete`, {
+          courseId,
+          languageId,
+          topicId
+        }, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          }
+        });
+
+        if (res.status === 200) {
+          setIsTopicCompleted(true);
+        } else {
+          console.error('Failed to mark topic as complete:', res.data);
+        }
+      } catch (err) {
+        console.error('Error marking topic as complete:', err);
+      }
     }
-  }
-};
+  };
 
 
 
@@ -317,13 +315,42 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
       case "Watch Video":
         return topicData.youtubeLinks?.length > 0 ? (
-          topicData.youtubeLinks.map((link, idx) => (
-            <div key={idx} className="mb-6">
-              <iframe src={link} title={`Video ${idx + 1}`} className="w-full h-64 rounded" allowFullScreen></iframe>
-            </div>
-          ))
+          <div className="space-y-8 w-full">
+            {topicData.youtubeLinks.map((link, idx) => (
+              <div key={idx} className="relative group w-full">
+                <div className="w-full h-[500px] rounded-xl overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl">
+                  <iframe 
+                    src={link} 
+                    title={`Video ${idx + 1}`} 
+                    className="w-full h-full rounded-xl"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Typography variant="small" className="text-white font-medium">
+                    Video {idx + 1}
+                  </Typography>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          <Typography>No videos available for this topic.</Typography>
+          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl">
+            <svg 
+              className="w-16 h-16 text-gray-400 mb-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" 
+              />
+            </svg>
+            <Typography className="text-gray-600">No videos available for this topic.</Typography>
+          </div>
         );
 
 case 'Quiz': {

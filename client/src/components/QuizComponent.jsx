@@ -28,53 +28,72 @@ const QuizQuestion = ({
   correctAnswerText = correctAnswerText.toLowerCase();
 
   return (
-    <Card className="p-4 mb-4">
-      <Typography variant="h6" className="mb-2">
+    <Card className="p-6 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 bg-white rounded-xl">
+      <Typography variant="h6" className="mb-4 text-gray-800 font-semibold">
         {`${questionIndex + 1}. ${questionData.question}`}
       </Typography>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {options.map((opt, i) => {
           const optLower = opt.toLowerCase();
-
           const isSelected = optLower === selected;
           const isCorrectAnswer = optLower === correctAnswerText;
-
           const showGreen = isSubmitted && isCorrectAnswer;
           const showRed = isSubmitted && isSelected && !isCorrectAnswer;
 
           return (
-            <Radio
+            <div
               key={i}
-              name={`question-${questionIndex}`}
-              label={
-                <span
-                  className={
-                    showGreen
-                      ? 'text-green-600 font-semibold'
-                      : showRed
-                      ? 'text-red-600 font-semibold'
-                      : ''
-                  }
-                >
-                  {opt}
-                </span>
-              }
-              value={opt}
-              checked={isSelected}
-              onChange={() => handleOptionChange(questionIndex, opt)}
-              disabled={isSubmitted}
-              ripple={false}
-              className="hover:bg-gray-100 rounded"
-            />
+              onClick={() => !isSubmitted && handleOptionChange(questionIndex, opt)}
+              className={`p-3 rounded-lg transition-all duration-200 cursor-pointer ${
+                isSelected ? 'bg-green-50 border-2 border-green-500' : 'hover:bg-gray-50'
+              } ${
+                showGreen
+                  ? 'bg-green-50 border-2 border-green-500'
+                  : showRed
+                  ? 'bg-red-50 border-2 border-red-500'
+                  : 'border border-gray-200'
+              }`}
+            >
+              <Radio
+                name={`question-${questionIndex}`}
+                label={
+                  <span
+                    className={`text-base ${
+                      isSelected
+                        ? 'text-green-700 font-semibold'
+                        : showGreen
+                        ? 'text-green-700 font-semibold'
+                        : showRed
+                        ? 'text-red-700 font-semibold'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    {opt}
+                  </span>
+                }
+                value={opt}
+                checked={isSelected}
+                onChange={() => handleOptionChange(questionIndex, opt)}
+                disabled={isSubmitted}
+                ripple={false}
+                className="hover:bg-transparent"
+                containerProps={{
+                  className: "hover:bg-transparent",
+                }}
+                color="green"
+              />
+            </div>
           );
         })}
       </div>
 
       {isSubmitted && selected !== correctAnswerText && (
-        <Typography className="mt-2 text-sm text-green-700">
-          ✅ Correct Answer: {questionData.correctAnswer}
-        </Typography>
+        <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+          <Typography className="text-sm text-green-700 font-medium flex items-center gap-2">
+            <span className="text-lg">✅</span> Correct Answer: {questionData.correctAnswer}
+          </Typography>
+        </div>
       )}
     </Card>
   );
