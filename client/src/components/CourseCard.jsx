@@ -2,18 +2,25 @@ import { Card, CardBody, CardFooter, Typography, Button } from "@material-tailwi
 
 export default function CourseCard({ course }) {
   return (
-    <Card className="mt-6 w-96 p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg">
-      <CardBody>
-        <Typography variant="h5" color="white" className="mb-2">
+    <Card className="bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden border border-slate-700">
+      <CardBody className="p-8">
+        {/* Course Title */}
+        <Typography variant="h5" className="mb-3 font-bold text-white">
           {course.title}
         </Typography>
-        <Typography color="white" className="text-gray-200">
+
+        {/* Course Description */}
+        <Typography className="text-base text-slate-400 leading-relaxed">
           {course.description}
         </Typography>
       </CardBody>
-      <CardFooter className="pt-0">
-        <Button size="sm" variant="filled" color="yellow" className="flex items-center gap-2">
-          Learn More
+
+      <CardFooter className="pt-0 px-8 pb-8">
+        <Button 
+          size="lg" 
+          className="w-full p-5 bg-blue-200 text-black"
+        >
+          Enroll
         </Button>
       </CardFooter>
     </Card>

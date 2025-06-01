@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Typography, Radio } from '@material-tailwind/react';
+import { theme } from '../theme';
 
 const QuizQuestion = ({
   questionData,
@@ -28,8 +29,8 @@ const QuizQuestion = ({
   correctAnswerText = correctAnswerText.toLowerCase();
 
   return (
-    <Card className="p-6 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 bg-white rounded-xl">
-      <Typography variant="h6" className="mb-4 text-gray-800 font-semibold">
+    <Card className={`p-6 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 bg-[${theme.colors.background.paper}] rounded-xl`}>
+      <Typography variant="h6" className={`mb-4 text-[${theme.colors.text.primary}] font-semibold`}>
         {`${questionIndex + 1}. ${questionData.question}`}
       </Typography>
 
@@ -46,13 +47,13 @@ const QuizQuestion = ({
               key={i}
               onClick={() => !isSubmitted && handleOptionChange(questionIndex, opt)}
               className={`p-3 rounded-lg transition-all duration-200 cursor-pointer ${
-                isSelected ? 'bg-green-50 border-2 border-green-500' : 'hover:bg-gray-50'
+                isSelected ? `bg-[${theme.colors.primary.main}]/10 border-2 border-[${theme.colors.primary.main}]` : `hover:bg-[${theme.colors.background.default}]`
               } ${
                 showGreen
-                  ? 'bg-green-50 border-2 border-green-500'
+                  ? `bg-[${theme.colors.primary.main}]/10 border-2 border-[${theme.colors.primary.main}]`
                   : showRed
-                  ? 'bg-red-50 border-2 border-red-500'
-                  : 'border border-gray-200'
+                  ? `bg-[${theme.colors.primary.dark}]/10 border-2 border-[${theme.colors.primary.dark}]`
+                  : `border border-[${theme.colors.background.default}]`
               }`}
             >
               <Radio
@@ -61,12 +62,12 @@ const QuizQuestion = ({
                   <span
                     className={`text-base ${
                       isSelected
-                        ? 'text-green-700 font-semibold'
+                        ? `text-[${theme.colors.primary.main}] font-semibold`
                         : showGreen
-                        ? 'text-green-700 font-semibold'
+                        ? `text-[${theme.colors.primary.main}] font-semibold`
                         : showRed
-                        ? 'text-red-700 font-semibold'
-                        : 'text-gray-700'
+                        ? `text-[${theme.colors.primary.dark}] font-semibold`
+                        : `text-[${theme.colors.text.primary}]`
                     }`}
                   >
                     {opt}
@@ -81,7 +82,7 @@ const QuizQuestion = ({
                 containerProps={{
                   className: "hover:bg-transparent",
                 }}
-                color="green"
+                color="blue"
               />
             </div>
           );
@@ -89,8 +90,8 @@ const QuizQuestion = ({
       </div>
 
       {isSubmitted && selected !== correctAnswerText && (
-        <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-          <Typography className="text-sm text-green-700 font-medium flex items-center gap-2">
+        <div className={`mt-4 p-3 bg-[${theme.colors.primary.main}]/10 rounded-lg border border-[${theme.colors.primary.main}]`}>
+          <Typography className={`text-sm text-[${theme.colors.primary.main}] font-medium flex items-center gap-2`}>
             <span className="text-lg">✅</span> Correct Answer: {questionData.correctAnswer}
           </Typography>
         </div>

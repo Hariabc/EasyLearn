@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+:root {
+  /* Primary Colors */
+  --color-primary-main: #2563eb;
+  --color-primary-light: #3b82f6;
+  --color-primary-dark: #1e40af;
+
+  /* Secondary Colors */
+  --color-secondary-main: #f59e42;
+  --color-secondary-light: #ffe7c2;
+  --color-secondary-dark: #b26a1a;
+
+  /* Backgrounds */
+  --color-background-default: #f4f6fa;
+  --color-background-paper: #ffffff;
+  --color-surface: #e5e7eb;
+
+  /* Text Colors */
+  --color-text-primary: #1a202c;
+  --color-text-secondary: #4b5563;
+  --color-text-inverse: #000000;
+
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-warning: #facc15;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+
+  /* EasyLearn Logo Colors */
+  --color-easylearn-deep-indigo: #1E1F6E;
+  --color-easylearn-royal-blue: #3A41B0;
+  --color-easylearn-sky-blue: #00C6FF;
+  --color-easylearn-soft-aqua: #4CB8E5;
+  --color-easylearn-midnight-navy: #10113C;
+}

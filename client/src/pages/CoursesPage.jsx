@@ -1,72 +1,89 @@
 import React from "react";
-import graduateImg from "../assets/graduate_4253213.png";
 import CourseCard from "../components/CourseCard";
 
 const sampleCourses = [
   {
-    title: "Web Development Bootcamp",
-    description: "Learn HTML, CSS, JavaScript, and React from scratch.",
+    title: "Frontend Development",
+    description: "Includes videos, notes, quizzes, and coding challenges."
   },
   {
-    title: "Python for Data Science",
-    description: "Analyze data and build machine learning models with Python.",
+    title: "Backend Development",
+    description: "Learn Flask, Node.js, Express.js, FastAPI, MongoDB, and SQL"
   },
   {
-    title: "UI/UX Design Principles",
-    description: "Create beautiful and user-friendly interfaces.",
+    title: "Computer Programming Languages",
+    description: "Learn C, C++, Java, Python, TypeScript, Go, and more"
   },
   {
-    title: "Cloud Fundamentals",
-    description:
-      "Understand cloud concepts and start working with AWS & Azure.",
+    title: "Aptitude",
+    description: "Quantitative Aptitude, Logical & Non-Verbal Reasoning, Verbal Ability"
   },
   {
-    title: "Cybersecurity Basics",
-    description: "Learn how to protect systems and data securely.",
-  },
-  {
-    title: "Machine Learning Introduction",
-    description: "Start your ML journey with hands-on projects.",
-  },
+    title: "Data Structures & Algorithms",
+    description: "Master DSA topics from basics through advanced"
+  }
 ];
 
 export default function CoursesPage() {
-  const positions = [
-    "top-0 left-14/30 -translate-x-1/2", // top center
-    "top-1/4 left-8/9 -translate-x-full -translate-y-1/2", // right top
-    "top-3/4 left-8/9 -translate-x-full -translate-y-1/2", // right bottom
-    "bottom-0 left-14/30 -translate-x-1/2", // bottom center
-    "top-3/4 left-1/20 -translate-y-1/2", // left bottom
-    "top-1/4 left-1/21 -translate-y-1/2", // left top
-  ];
-
   return (
-  <>
-  <h4 className="text-4xl font-bold text-blue-400 z-0 flex justify-center items-center">
-        What we OFFER..?
-      </h4>
-    <main className="relative mb-20 w-full flex justify-center items-center overflow-hidden h-[90vh]">
-      {/* Central image */}
-      <div className="w-40 h-40 rounded-full bg-white z-10 flex justify-center items-center shadow-md">
-        <img src={graduateImg} alt="Graduation icon" className="w-28 h-28" />
-      </div>
-      {/* <h4 className="absolute text-8xl font-bold text-blue-400 z-0">
-        What we OFFER..?
-      </h4>
-      <h4 className="absolute text-8xl font-bold text-blue-400 z-20">
-        What we OFFER..?
-      </h4> */}
-      {/* Circular cards */}
-      {sampleCourses.map((course, index) => (
-        <div
-          key={index}
-          className={`absolute ${positions[index]} transform`}
-          style={{ width: "300px" }}
-        >
-          <CourseCard course={course} />
+    <div className="bg-slate-900 min-h-screen">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-90"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6">
+              Master Your Skills
+            </h1>
+            <p className="text-xl text-purple-100 max-w-3xl mx-auto">
+              Explore our comprehensive courses designed to help you excel in your career
+            </p>
+          </div>
         </div>
-      ))}
-    </main>
-    </>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <button className="px-6 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors">
+            All Courses
+          </button>
+          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Development
+          </button>
+          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Programming
+          </button>
+          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Aptitude
+          </button>
+        </div>
+
+        {/* Course Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {sampleCourses.map((course, index) => (
+            <div 
+              key={index} 
+              className="group"
+            >
+              <CourseCard course={course} />
+            </div>
+          ))}
+        </div>
+        {/* CTA Section */}
+        <div className="mt-24 text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Ready to Start Your Learning Journey?
+          </h2>
+          <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
+            Join thousands of students who have already transformed their careers with EasyLearn
+          </p>
+          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium text-lg">
+            Get Started Now
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

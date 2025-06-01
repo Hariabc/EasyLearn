@@ -1,106 +1,101 @@
 import React from "react";
-import { Card, CardBody, Typography, Avatar } from "@material-tailwind/react";
+import { Typography, Card } from "@material-tailwind/react";
 
-export function FeatureSection() {
+export default function FeatureSection() {
   return (
-    <section className="min-h-[120vh] py-16 px-8 bg-gradient-to-r from-blue-50 to-white">
-      <div className="container mx-auto mb-12 text-center">
-        <Typography color="blue-gray" className="mb-2 font-bold uppercase text-xl">
-          EasyLearn Features
-        </Typography>
-        <Typography color="blue-gray" className="mb-6 text-3xl font-semibold">
-          Unlock Your Potential with EasyLearn
-        </Typography>
-        <Typography variant="lead" className="mx-auto max-w-2xl text-gray-600">
-          At EasyLearn, we provide you with the tools, resources, and support to master new skills, advance your career, and grow as an individual. Join us today and start your learning journey.
-        </Typography>
-      </div>
+    <section className="px-4 sm:px-6 lg:px-8 bg-slate-900 pb-20">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-block px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium mb-4">
+            Why Choose EasyLearn?
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Features That Set Us Apart
+          </h2>
+        </div>
 
-      <div className="container mx-auto grid gap-8 lg:grid-cols-3 sm:grid-cols-1">
-        {/* Feature 1 */}
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardBody className="text-center p-6">
-            <Typography variant="h5" color="blue-gray" className="mb-3 font-semibold">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
               Flexible Learning
             </Typography>
-            <Typography className="text-base text-gray-500 mb-4">
-              Learn at your own pace with flexible schedules and personalized learning paths tailored to your needs.
+            <Typography className="text-slate-400">
+              Learn at your own pace with 24/7 access to all course materials and resources.
             </Typography>
-            <img
-              src="/image/learning.svg"
-              alt="Flexible Learning"
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          </CardBody>
-        </Card>
+          </Card>
 
-        {/* Feature 2 */}
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardBody className="text-center p-6">
-            <Typography variant="h5" color="blue-gray" className="mb-3 font-semibold">
-              Expert-Led Courses
+          {/* Feature 2 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">👨‍🏫</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
+              Top-Quality Resources
             </Typography>
-            <Typography className="text-base text-gray-500 mb-4">
-              Learn from industry experts who provide practical, real-world knowledge and hands-on experience.
+            <Typography className="text-slate-400">
+              Learn from top instructors and industry experts with years of hands-on experience.
             </Typography>
-            <img
-              src="/image/expert-course.svg"
-              alt="Expert-Led Courses"
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          </CardBody>
-        </Card>
+          </Card>
 
-        {/* Feature 3 */}
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardBody className="text-center p-6">
-            <Typography variant="h5" color="blue-gray" className="mb-3 font-semibold">
-              Community Support
+          {/* Feature 3 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">🤝</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
+              AI-Powered Doubt Solver
             </Typography>
-            <Typography className="text-base text-gray-500 mb-4">
-              Join a vibrant community of learners, share experiences, and get support from fellow students and mentors.
+            <Typography className="text-slate-400">
+              Get instant help with your questions through our intelligent AI doubt-solving system.
             </Typography>
-            <img
-              src="/image/community-support.svg"
-              alt="Community Support"
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          </CardBody>
-        </Card>
-      </div>
+          </Card>
 
-      <div className="container mx-auto grid gap-8 lg:grid-cols-3 mt-12">
-        {/* Join Our Community */}
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardBody className="text-center p-6">
-            <Typography variant="h5" color="blue-gray" className="mb-3 font-semibold">
-              Join Our Community
+          {/* Feature 4 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">📝</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
+              Interactive Quizzes
             </Typography>
-            <Typography className="text-base text-gray-500 mb-4">
-              Be part of an engaging and supportive community where you can collaborate, learn, and grow together.
+            <Typography className="text-slate-400">
+              Test your understanding after each lesson with engaging quizzes and instant feedback.
             </Typography>
-          </CardBody>
-        </Card>
+          </Card>
 
-        {/* Testimonials or Additional Feature */}
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardBody className="text-center p-6">
-            <Typography variant="h5" color="blue-gray" className="mb-3 font-semibold">
-              Student Success Stories
+          {/* Feature 5 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">🔥</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
+              Streaks for Consistency
             </Typography>
-            <Typography className="text-base text-gray-500 mb-4">
-              Hear from our students about how EasyLearn helped them achieve their goals and succeed in their careers.
+            <Typography className="text-slate-400">
+              Stay motivated by building daily learning streaks and tracking your progress over time.
             </Typography>
-            <img
-              src="/image/testimonial.svg"
-              alt="Testimonial"
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          </CardBody>
-        </Card>
+          </Card>
+
+          {/* Feature 6 */}
+          <Card className="p-8 bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <span className="text-2xl">🏅</span>
+            </div>
+            <Typography variant="h5" className="mb-3 font-bold text-white">
+              Completion Badges
+            </Typography>
+            <Typography className="text-slate-400">
+              Earn digital badges upon completing each course to showcase your achievements.
+            </Typography>
+          </Card>
+        </div>
       </div>
     </section>
   );
 }
-
-export default FeatureSection;

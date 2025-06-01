@@ -1,24 +1,22 @@
-import { createTheme } from '@mui/material/styles';
-
 export const theme = {
   colors: {
     primary: {
-      main: '#3b82f6',
-      light: '#60a5fa',
-      dark: '#2563eb',
+      main: '#1A2930',     // DENIM
+      light: '#C5C1C0',    // SCREEN
+      dark: '#0A1612',     // STEEL
     },
     secondary: {
-      main: '#10b981',
-      light: '#34d399',
-      dark: '#059669',
+      main: '#F7CE3E',     // MARIGOLD
+      light: '#FFFBEA',    // lightened background version (optional)
+      dark: '#B29100',     // deeper version of marigold (optional)
     },
     background: {
-      default: '#f3f4f6',
-      paper: '#ffffff',
+      default: '#C5C1C0',  // SCREEN
+      paper: '#FFFFFF',    // white
     },
     text: {
-      primary: '#1f2937',
-      secondary: '#4b5563',
+      primary: '#0A1612',  // STEEL for high contrast text
+      secondary: '#1A2930' // DENIM for secondary text
     },
   },
   animations: {
@@ -61,4 +59,4 @@ export const tailwindConfig = {
       boxShadow: theme.shadows,
     },
   },
-}; 
+};

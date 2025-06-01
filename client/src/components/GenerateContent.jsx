@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { addContent, getContent } from "../../services/contentService";
 import { FallingLines } from "react-loader-spinner";
+import { theme } from "../theme";
 
 const GenerateContent = ({ topic, subject }) => {
   const apiKey = import.meta.env.VITE_groqApiKey;
@@ -80,7 +81,7 @@ const GenerateContent = ({ topic, subject }) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-h-[60vh]">
-        <p className="text-red-600 text-lg font-semibold">{error}</p>
+        <p className={`text-[${theme.colors.primary.dark}] text-lg font-semibold`}>{error}</p>
       </div>
     );
   }
@@ -89,12 +90,12 @@ const GenerateContent = ({ topic, subject }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-h-[60vh]">
         <FallingLines
-          color="black"
+          color={theme.colors.primary.main}
           width="150"
           visible={true}
           ariaLabel="falling-circles-loading"
         />
-        <p className="text-base text-gray-500 font-light my-4">
+        <p className={`text-base text-[${theme.colors.text.secondary}] font-light my-4`}>
           Loading Content...
         </p>
       </div>
@@ -102,7 +103,7 @@ const GenerateContent = ({ topic, subject }) => {
   }
 
   return (
-    <div>
+    <div className={`text-[${theme.colors.text.primary}]`}>
       <ReactMarkdown breaks={true} className="markdown-body">
         {content}
       </ReactMarkdown>

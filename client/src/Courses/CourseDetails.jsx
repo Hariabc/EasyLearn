@@ -346,9 +346,9 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl">
+          <div className="flex flex-col items-center justify-center py-12 bg-[#141619] rounded-xl">
             <svg 
-              className="w-16 h-16 text-gray-400 mb-4" 
+              className="w-16 h-16 text-[#B3B4BD] mb-4" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -360,7 +360,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" 
               />
             </svg>
-            <Typography className="text-gray-600">No videos available for this topic.</Typography>
+            <Typography className="text-[#B3B4BD]">No videos available for this topic.</Typography>
           </div>
         );
 
@@ -384,7 +384,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
                 {!isSubmitted ? (
                   <Button
                     onClick={handleSubmitQuiz}
-                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                    className="mt-4 bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
                   >
                     Submit Quiz
                   </Button>
@@ -394,7 +394,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
                       You scored {score} out of {aiQuizQuestions.length}
                     </Typography>
                     {isTopicCompleted && (
-                      <Typography className="mt-2 text-green-600">
+                      <Typography className="mt-2 text-[#0A21C0]">
                         ✅ Topic marked as completed!
                       </Typography>
                     )}
@@ -439,7 +439,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
             <Typography className="mb-2 font-medium text-gray-700 text-sm">
               AI Response:
             </Typography>
-            <Card className="p-4 bg-gray-100 whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto">
+            <Card className="p-4 bg-[#141619] whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto text-[#B3B4BD]">
               {response || 'AI response will appear here.'}
             </Card>
             <Typography className="mb-2 font-medium text-gray-700 mt-4 text-sm">
@@ -455,7 +455,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
               <Button
                 onClick={handleAIRequest}
                 disabled={aiLoading || !prompt.trim()}
-                className="rounded-full bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0"
+                className="rounded-full bg-[#0A21C0] hover:bg-[#050A44] w-12 h-12 flex items-center justify-center p-0"
                 aria-label="Submit AI prompt"
               >
                 {aiLoading ? (
@@ -487,10 +487,10 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
   };
 
   return (
-    <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-gray-50">
+    <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-[#141619]">
       {/* Sidebar */}
-      <div className="w-full md:w-1/4 bg-white shadow-lg rounded p-4">
-        <Typography variant="h6" className="mb-4 capitalize">
+      <div className="w-full md:w-1/4 bg-[#2C2E3A] shadow-lg rounded p-4">
+        <Typography variant="h6" className="mb-4 capitalize text-[#B3B4BD]">
           {language ? `${language} - ${topic}` : topic}
         </Typography>
         <List>
@@ -500,8 +500,8 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
               onClick={() => setSelectedTab(tab)}
               className={`cursor-pointer rounded px-3 py-2 ${
                 selectedTab === tab
-                  ? 'bg-blue-100 font-semibold text-blue-700'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-[#0A21C0] font-semibold text-[#B3B4BD]'
+                  : 'hover:bg-[#141619] text-[#B3B4BD]'
               }`}
             >
               {tab}
@@ -511,8 +511,8 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
       </div>
 
       {/* Main Content */}
-      <div className="w-full md:w-3/4 bg-white shadow-lg rounded p-6">
-        <Typography variant="h6" className="mb-4 text-blue-800">
+      <div className="w-full md:w-3/4 bg-[#2C2E3A] shadow-lg rounded p-6">
+        <Typography variant="h6" className="mb-4 text-[#0A21C0]">
           {selectedTab}
         </Typography>
         {renderContent()}
