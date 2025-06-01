@@ -46,7 +46,7 @@ const QuizQuestion = ({
               key={i}
               onClick={() => !isSubmitted && handleOptionChange(questionIndex, opt)}
               className={`p-3 rounded-lg transition-all duration-200 cursor-pointer ${
-                isSelected ? 'bg-green-50 border-2 border-green-500' : 'hover:bg-gray-50'
+                isSelected ? 'bg-blue-100 border-2 border-blue-500' : 'hover:bg-gray-50'
               } ${
                 showGreen
                   ? 'bg-green-50 border-2 border-green-500'
@@ -56,33 +56,33 @@ const QuizQuestion = ({
               }`}
             >
               <Radio
-                name={`question-${questionIndex}`}
-                label={
-                  <span
-                    className={`text-base ${
-                      isSelected
-                        ? 'text-green-700 font-semibold'
-                        : showGreen
-                        ? 'text-green-700 font-semibold'
-                        : showRed
-                        ? 'text-red-700 font-semibold'
-                        : 'text-gray-700'
-                    }`}
-                  >
-                    {opt}
-                  </span>
-                }
-                value={opt}
-                checked={isSelected}
-                onChange={() => handleOptionChange(questionIndex, opt)}
-                disabled={isSubmitted}
-                ripple={false}
-                className="hover:bg-transparent"
-                containerProps={{
-                  className: "hover:bg-transparent",
-                }}
-                color="green"
-              />
+  name={`question-${questionIndex}`}
+  label={
+    <span
+      className={`text-base ${
+        isSelected
+          ? 'text-black-700 font-semibold'
+          : showGreen
+          ? 'text-green-700 font-semibold'
+          : showRed
+          ? 'text-red-700 font-semibold'
+          : 'text-gray-700'
+      }`}
+    >
+      {opt}
+    </span>
+  }
+  value={opt}
+  checked={isSelected}
+  onChange={() => handleOptionChange(questionIndex, opt)}
+  disabled={isSubmitted}
+  ripple={false}
+  className="hover:bg-transparent"
+  containerProps={{
+    className: "hover:bg-transparent",
+  }}
+/>
+
             </div>
           );
         })}
