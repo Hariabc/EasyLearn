@@ -72,13 +72,13 @@ const FrontEndTopics = () => {
 
   if (loading)
     return (
-      <div className="p-8 text-blue-500 font-medium animate-pulse">
+      <div className="p-8 text-blue-400 font-medium animate-pulse">
         Loading topics...
       </div>
     );
   if (error)
     return (
-      <div className="p-8 text-red-600 font-medium">Error: {error}</div>
+      <div className="p-8 text-red-400 font-medium">Error: {error}</div>
     );
 
   const totalTopics = topics.length;
@@ -86,12 +86,12 @@ const FrontEndTopics = () => {
     userLanguageProgress?.completedTopics?.length || 0;
 
   return (
-    <div className="p-8">
-      <Typography variant="h4" className="mb-1">
+    <div className="bg-slate-900 min-h-screen p-8">
+      <Typography variant="h4" className="mb-1 text-white font-bold">
         Topics
       </Typography>
-      <Typography variant="small" className="text-gray-700 mb-4">
-        {completedTopicsCount} of {totalTopics} topics completed
+      <Typography variant="small" className="text-gray-300 mb-4">
+        <span className="font-semibold text-blue-400">{completedTopicsCount}</span> of <span className="font-semibold text-white">{totalTopics}</span> topics completed
       </Typography>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -103,23 +103,24 @@ const FrontEndTopics = () => {
           return (
             <Card
               key={topic._id}
-              className="cursor-pointer hover:shadow-xl transition"
+              className="cursor-pointer hover:shadow-xl transition border border-slate-700 bg-slate-800"
               onClick={() => handleTopicClick(topic)}
             >
               <CardBody>
-                <Typography variant="h6">{topic.title}</Typography>
-                <Typography variant="small">
+                <Typography variant="h6" className="text-white">{topic.title}</Typography>
+                <Typography variant="small" className="text-gray-400">
                   Click to explore {topic.title}
                 </Typography>
 
                 <div className="mt-2">
                   <Progress
                     value={percent}
-                    color={percent === 100 ? 'green' : 'blue'}
+                    color={percent === 100 ? 'green-400' : 'blue-400'}
+                    className="h-3 bg-white"
                   />
                   <Typography
                     variant="small"
-                    className="text-right mt-1 text-gray-600"
+                    className={`text-right mt-1 ${isCompleted ? "text-green-400 font-semibold" : "text-gray-400"}`}
                   >
                     {percent}% completed
                   </Typography>

@@ -2,7 +2,9 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import graduateImg from '../../assets/education_10353866.png';
+import logo from '../../assets/login-bg-01.png';
 import api from '../../axios'; // Use your pre-configured axios instance
+import { motion } from 'framer-motion';
 
 const SignUp = () => {
   const { login } = useContext(AuthContext);
@@ -48,26 +50,29 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-md w-full">
-        {/* Logo Section */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center justify-center">
-            <img className="h-16 w-auto" src={graduateImg} alt="EasyLearn" />
-            <span className="ml-3 text-4xl font-bold text-blue-600">EasyLearn</span>
-          </Link>
+    <div className="min-h-screen bg-slate-800 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+      <motion.div
+        className="max-w-4xl w-full min-h-[65vh] bg-white shadow-xl rounded-lg flex flex-col md:flex-row overflow-hidden transition-all duration-300 hover:shadow-2xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        {/* Left: Image Section */}
+        <div className="hidden md:flex w-1/2 bg-blue-50 items-center justify-center h-[36rem]">
+          <img src={logo} alt="EasyLearn" className="w-full h-full object-cover" />
         </div>
-
-        {/* Sign Up Form */}
-        <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10">
+        {/* Right: Form Section */}
+        <div className="w-full md:w-1/2 py-6 px-6 sm:px-10 flex flex-col justify-center md:h-[36rem]">
+          {/* Brand text above heading */}
+          <div className="text-4xl font-bold text-blue-600 text-center mb-4">EasyLearn</div>
           {/* Title Section */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
               Create your account
             </h2>
             <p className="mt-2 text-base text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
                 Sign in
               </Link>
             </p>
@@ -143,7 +148,7 @@ const SignUp = () => {
               </div>
             )}
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
@@ -164,7 +169,7 @@ const SignUp = () => {
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -201,12 +201,12 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-slate-800">
       {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-col ${
           isDesktopSidebarExpanded ? "w-64" : "w-20"
-        } bg-white shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
+        } bg-slate-900 shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -215,20 +215,15 @@ const Dashboard = () => {
               isDesktopSidebarExpanded
                 ? "justify-between px-6"
                 : "justify-center px-2"
-            } py-5 border-b border-gray-200`}
+            } py-5 border-b border-slate-700`}
           >
             <div
               className={`flex items-center ${
                 isDesktopSidebarExpanded ? "gap-3" : ""
               }`}
             >
-              <img
-                src={logo}
-                alt="EasyLearn Logo"
-                className={`${isDesktopSidebarExpanded ? "h-8" : "h-0"}`}
-              />
               {isDesktopSidebarExpanded && (
-                <span className="text-xl font-semibold tracking-tight text-gray-900">
+                <span className="text-xl font-semibold tracking-tight text-white">
                   EasyLearn
                 </span>
               )}
@@ -241,9 +236,9 @@ const Dashboard = () => {
               aria-label="Toggle desktop sidebar"
             >
               {isDesktopSidebarExpanded ? (
-                <ChevronLeftIcon className="h-6 w-6 text-gray-700" />
+                <ChevronLeftIcon className="h-6 w-6 text-gray-300" />
               ) : (
-                <ChevronRightIcon className="h-6 w-6 text-gray-700" />
+                <ChevronRightIcon className="h-6 w-6 text-gray-300" />
               )}
             </button>
           </div>
@@ -257,11 +252,11 @@ const Dashboard = () => {
                   e.preventDefault();
                   handleNavigationClick(item.path);
                 }}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${
                   !isDesktopSidebarExpanded ? "justify-center" : ""
                 }`}
               >
-                <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-500">
+                <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
                   {item.icon}
                 </span>
                 {isDesktopSidebarExpanded && (
@@ -271,27 +266,27 @@ const Dashboard = () => {
             ))}
           </nav>
           {/* User Section */}
-          <div className="py-4 border-t border-gray-200">
+          <div className="py-4 border-t border-slate-700">
             <div className="flex gap-2 flex-col">
               {isDesktopSidebarExpanded ? (
                 <>
                   <button
                     onClick={handleProfileClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
                   >
                     <UserCircleIcon className="h-5 w-5" />
                     Profile
                   </button>
                   <button
                     onClick={handleSettingsClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
                   >
                     <Cog6ToothIcon className="h-5 w-5" />
                     Settings
                   </button>
                   <button
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-red-600 hover:bg-red-50"
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
                   >
                     <PowerIcon className="h-5 w-5" />
                     Logout
@@ -341,17 +336,17 @@ const Dashboard = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="Mobile Sidebar"
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
             <div className="flex items-center gap-3">
               <img src={logo} alt="EasyLearn Logo" className="h-8" />
-              <span className="text-xl font-semibold tracking-tight text-gray-900">
+              <span className="text-xl font-semibold tracking-tight text-white">
                 EasyLearn
               </span>
             </div>
@@ -360,7 +355,7 @@ const Dashboard = () => {
               className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
               aria-label="Close mobile sidebar"
             >
-              <XMarkIcon className="h-6 w-6 text-gray-700" />
+              <XMarkIcon className="h-6 w-6 text-gray-300" />
             </button>
           </div>
           {/* Navigation */}
@@ -373,9 +368,9 @@ const Dashboard = () => {
                   e.preventDefault();
                   handleNavigationClick(item.path);
                 }}
-                className="group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600"
+                className="group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium hover:bg-blue-50 hover:text-blue-600"
               >
-                <span className="flex-shrink-0 text-gray-400 group-hover:text-blue-500">
+                <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
                   {item.icon}
                 </span>
                 <span>{item.text}</span>
@@ -383,25 +378,25 @@ const Dashboard = () => {
             ))}
           </nav>
           {/* User Section */}
-          <div className="px-2 py-4 border-t border-gray-200">
+          <div className="px-2 py-4 border-t border-slate-700">
             <div className="flex gap-2 flex-col justify-between">
               <button
                 onClick={handleProfileClick}
-                className="flex items-center gap-1 rounded-lg px-6 py-2 w-full  text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full  text-gray-300 hover:bg-blue-50 hover:text-blue-600"
               >
                 <UserCircleIcon className="h-5 w-5" />
                 Profile
               </button>
               <button
                 onClick={handleSettingsClick}
-                className="flex items-center gap-1 rounded-lg px-6 py-2 w-full  text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full  text-gray-300 hover:bg-blue-50 hover:text-blue-600"
               >
                 <Cog6ToothIcon className="h-5 w-5" />
                 Settings
               </button>
               <button
                 onClick={handleLogoutClick}
-                className="flex items-center gap-1 rounded-lg px-6 py-2 w-full text-red-600 hover:bg-red-50"
+                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
               >
                 <PowerIcon className="h-5 w-5" />
                 Logout
@@ -423,25 +418,25 @@ const Dashboard = () => {
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none"
             aria-label="Open mobile menu"
           >
-            <Bars3Icon className="h-6 w-6 text-gray-700" />
+            <Bars3Icon className="h-6 w-6 text-gray-300" />
           </button>
           <div className="flex  gap-2">
             <img src={logo} alt="EasyLearn Logo" className="h-8" />
-            <span className="text-xl font-semibold tracking-tight text-gray-900">
+            <span className="text-xl font-semibold tracking-tight text-white">
               EasyLearn
             </span>
           </div>
         </div>
 
-        <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 text-white">
           Welcome, {user.name || "User"}!
         </h1>
 
         {/* Ongoing Courses */}
-        <section className="bg-white p-4 lg:p-8 rounded-xl lg:rounded-2xl shadow-lg mb-6 lg:mb-8">
-          <h3 className=" lg:text-2xl lg:mb-6 flex items-center gap-2 text-2xl font-semibold text-blue-800 mb-6">
+        <section className="bg-slate-800 p-4 lg:p-8 rounded-xl lg:rounded-2xl shadow-lg mb-6 lg:mb-8">
+          <h3 className=" lg:text-2xl lg:mb-6 flex items-center gap-2 text-2xl font-semibold text-blue-400 mb-6">
             <svg
-              className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500"
+              className="h-5 w-5 lg:h-6 lg:w-6 text-blue-400"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -459,12 +454,12 @@ const Dashboard = () => {
           {coursesLoading ? (
             <div className="flex items-center justify-center py-8 lg:py-12">
               <div className="animate-spin rounded-full h-8 w-8 lg:h-10 lg:w-10 border-t-4 border-b-4 border-blue-500"></div>
-              <span className="ml-3 lg:ml-4 text-gray-500 text-base lg:text-lg">
+              <span className="ml-3 lg:ml-4 text-gray-400 text-base lg:text-lg">
                 Loading courses...
               </span>
             </div>
           ) : enrolledCourses.length === 0 ? (
-            <div className="flex flex-col items-center py-8 lg:py-12 text-gray-400">
+            <div className="flex flex-col items-center py-8 lg:py-12 text-gray-300">
               <svg
                 className="h-10 w-10 lg:h-12 lg:w-12 mb-2"
                 fill="none"
@@ -489,19 +484,19 @@ const Dashboard = () => {
                 {enrolledCourses.map((course, index) => (
                   <div
                     key={index}
-                    className="border border-blue-100 bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
+                    className="border border-slate-700 bg-slate-800 p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
                   >
-                    <h4 className="text-lg font-bold text-black mb-2">
+                    <h4 className="text-lg font-bold text-white mb-2">
                       {course.course.title}
                     </h4>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-400 mb-4">
                       Includes videos, notes, quizzes, and coding challenges.
                     </p>
 
                     {/* Progress bar and percentage on the same line */}
                     <div className="flex items-center gap-3 mb-4">
                       {/* Progress bar container */}
-                      <div className="flex-1 bg-blue-100 rounded-full h-2">
+                      <div className="flex-1 bg-white rounded-full h-2">
                         {/* Progress bar fill */}
                         <div
                           className="bg-gradient-to-r from-blue-600 to-orange-400 h-2 rounded-full transition-all duration-500"
@@ -532,17 +527,17 @@ const Dashboard = () => {
         </section>
 
         {/* Available Courses */}
-        <section className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg mb-6">
-          <h3 className="text-lg lg:text-xl font-semibold mb-4">
+        <section className="bg-slate-800 p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg mb-6">
+          <h3 className="text-lg lg:text-xl font-semibold mb-4 text-blue-400">
             Available Courses
           </h3>
           {coursesLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-blue-500"></div>
-              <span className="ml-3 text-gray-500">Loading courses...</span>
+              <span className="ml-3 text-gray-400">Loading courses...</span>
             </div>
           ) : availableCourses.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">
+            <p className="text-center text-gray-300 py-8">
               No new courses available to enroll.
             </p>
           ) : (
@@ -550,13 +545,13 @@ const Dashboard = () => {
               {availableCourses.map((course) => (
                 <div
                   key={course._id}
-                  className="border rounded-xl p-4 shadow hover:shadow-lg cursor-pointer flex flex-col justify-between"
+                  className="border border-slate-700 rounded-xl p-4 shadow hover:shadow-lg cursor-pointer flex flex-col justify-between bg-slate-800"
                 >
                   <div onClick={() => handleCourseView(course)}>
-                    <h4 className="text-base lg:text-lg font-semibold mb-2">
+                    <h4 className="text-base lg:text-lg font-semibold mb-2 text-white">
                       {course.title}
                     </h4>
-                    <p className="text-xs lg:text-sm text-gray-600 mb-3">
+                    <p className="text-xs lg:text-sm text-gray-400 mb-3">
                       {course.description || "No description available."}
                     </p>
                   </div>

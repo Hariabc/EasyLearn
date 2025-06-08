@@ -7,7 +7,7 @@ export default function FeatureSection() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium mb-4">
+          <div className="inline-block px-4 py-2 rounded-full bg-yellow-400 text-black text-sm font-medium mb-4">
             Why Choose EasyLearn?
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">

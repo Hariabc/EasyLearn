@@ -80,13 +80,13 @@ const Frontend = () => {
   if (!user) return <div>Loading user data...</div>;
   if (loading)
     return (
-      <div className="p-8 text-center text-blue-500 font-semibold animate-pulse">
+      <div className="p-8 text-center text-blue-400 font-semibold animate-pulse">
         Loading frontend languages...
       </div>
     );
   if (error)
     return (
-      <div className="p-8 text-center text-red-500 font-semibold">
+      <div className="p-8 text-center text-red-400 font-semibold">
         Error: {error}
       </div>
     );
@@ -98,13 +98,13 @@ const Frontend = () => {
     )?.length || 0;
 
   return (
-    <>
+    <div className="bg-slate-900 min-h-screen p-6">
       <div className="px-8 pb-2">
-        <Typography variant="h3" className="mb-1 text-blue-900 font-bold">
+        <Typography variant="h3" className="mb-1 text-white font-bold">
           Languages
         </Typography>
-        <Typography variant="small" className="text-gray-700">
-          <span className="font-semibold text-blue-600">{completedLanguages}</span> of <span className="font-semibold">{totalLanguages}</span> languages completed
+        <Typography variant="small" className="text-gray-300">
+          <span className="font-semibold text-blue-400">{completedLanguages}</span> of <span className="font-semibold text-white">{totalLanguages}</span> languages completed
         </Typography>
       </div>
 
@@ -125,15 +125,15 @@ const Frontend = () => {
               key={_id}
               className={`shadow-lg cursor-pointer hover:shadow-2xl transition-transform duration-200 hover:-translate-y-1 border-2 ${
                 isCompleted ? "border-green-400" : "border-transparent"
-              }`}
+              } bg-slate-800`}
               onClick={() => handleClick(_id)}
               style={{ minHeight: 230 }}
             >
               <CardHeader
                 floated={false}
-                className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-blue-400 py-6 rounded-t-lg"
+                className="flex flex-col items-center justify-center bg-blue-600 py-6 rounded-t-lg"
               >
-                <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow mb-2">
+                <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow mb-2 text-black">
                   {languageAvatars[name] || "📘"}
                 </div>
                 <Typography variant="h5" className="text-white font-bold mt-1">
@@ -141,18 +141,18 @@ const Frontend = () => {
                 </Typography>
               </CardHeader>
               <CardBody>
-                <Typography variant="small" className="mb-3 text-gray-700 min-h-[40px]">
+                <Typography variant="small" className="mb-3 text-gray-400 min-h-[40px]">
                   {description || `Explore ${name} programming language tutorials and resources.`}
                 </Typography>
                 <div className="mt-2">
                   <Progress
                     value={percent}
-                    color={isCompleted ? 'green' : 'blue'}
-                    className="h-3"
+                    color={isCompleted ? 'green-400' : 'blue-400'}
+                    className="h-3 bg-white"
                   />
                   <Typography
                     variant="small"
-                    className={`text-right mt-1 ${isCompleted ? "text-green-600 font-semibold" : "text-gray-600"}`}
+                    className={`text-right mt-1 ${isCompleted ? "text-green-400 font-semibold" : "text-gray-400"}`}
                   >
                     {percent}% completed
                   </Typography>
@@ -162,7 +162,7 @@ const Frontend = () => {
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 
