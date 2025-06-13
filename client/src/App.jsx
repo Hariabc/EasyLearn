@@ -21,133 +21,137 @@ import DSATopics from "./Courses/DSA/DSATopics";
 import MyCourses from "./pages/MyCourses";
 import BadgeComponent from "./components/BadgeCard";
 import StreakDisplay from "./components/StreakDisplay";
+import CodeEditor from "./pages/CodeEditor";
 
 function App() {
   return <>
     <Router>
       <Routes>
-        <Route path="/" element={<HeroSection16/>}></Route>
+        <Route path="/" element={<HeroSection16 />}></Route>
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <Dashboard/> 
-            </ProtectedRoute>
-          } />
+            <Dashboard />
+          </ProtectedRoute>
+        } />
 
-           <Route path="/my-courses" element={
-            <ProtectedRoute>
-              <MyCourses/>
-            </ProtectedRoute>
-          } />
+        <Route path="/my-courses" element={
+          <ProtectedRoute>
+            <MyCourses />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/my-badges" element={
-            <ProtectedRoute>
-              <BadgeComponent/>
-            </ProtectedRoute>
-          } />
+        <Route path="/codeeditor" element={
+          <ProtectedRoute>
+            <CodeEditor />
+          </ProtectedRoute>
+        } />
 
+        <Route path="/my-badges" element={
+          <ProtectedRoute>
+            <BadgeComponent />
+          </ProtectedRoute>
+        } />
 
         <Route path="/courses" element={
           <ProtectedRoute>
             <CoursesPage />
           </ProtectedRoute>} />
 
+        <Route path="/courses/computerlanguages" element={
+          <ProtectedRoute>
+            <ComputerLanguages />
+          </ProtectedRoute>
+        } />
 
+        <Route path="/courses/computerlanguages/:languageId" element={
+          <ProtectedRoute>
+            <LanguageTopics />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/courses/computerlanguages" element={
-            <ProtectedRoute>
-              <ComputerLanguages />
-            </ProtectedRoute>
-          } />
-          <Route path="/courses/computerlanguages/:languageId" element={
-            <ProtectedRoute>
-              <LanguageTopics/>
-            </ProtectedRoute>
-          } />
-          <Route path="/courses/computerlanguages/:languageId/:topic" element={
-            <ProtectedRoute>
-              <CourseDetail />
-              </ProtectedRoute>
-          } />
-
-
-
-           <Route path="/courses/frontend" element={
-            <ProtectedRoute>
-              <Frontend/>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/courses/frontend/:languageId" element={
-            <ProtectedRoute>
-             <FrontEndTopics/>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/courses/frontend/:languageId/:topic" element={
-            <ProtectedRoute>
-              <CourseDetail />
-              </ProtectedRoute>
-          } />
-
-
-          <Route path="/courses/backend" element={
-            <ProtectedRoute>
-              <BackEnd/>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/courses/backend/:languageId" element={
-            <ProtectedRoute>
-             <BackEndTopics/>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/courses/backend/:languageId/:topic" element={
-            <ProtectedRoute>
-              <CourseDetail />
-              </ProtectedRoute>
-          } />
+        <Route path="/courses/computerlanguages/:languageId/:topic" element={
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        } />
 
 
 
-          <Route path="/courses/aptitude" element={
-            <ProtectedRoute>
-              <Aptitude/>
-            </ProtectedRoute>
-          } />
+        <Route path="/courses/frontend" element={
+          <ProtectedRoute>
+            <Frontend />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/courses/aptitude/:languageId" element={
-            <ProtectedRoute>
-             <AptitudeTopics/>
-            </ProtectedRoute>
-          } />
+        <Route path="/courses/frontend/:languageId" element={
+          <ProtectedRoute>
+            <FrontEndTopics />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/courses/aptitude/:languageId/:topic" element={
-            <ProtectedRoute>
-              <CourseDetail />
-              </ProtectedRoute>
-          } />
+        <Route path="/courses/frontend/:languageId/:topic" element={
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        } />
+
+
+        <Route path="/courses/backend" element={
+          <ProtectedRoute>
+            <BackEnd />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/courses/backend/:languageId" element={
+          <ProtectedRoute>
+            <BackEndTopics />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/courses/backend/:languageId/:topic" element={
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/courses/aptitude" element={
+          <ProtectedRoute>
+            <Aptitude />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/courses/aptitude/:languageId" element={
+          <ProtectedRoute>
+            <AptitudeTopics />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/courses/aptitude/:languageId/:topic" element={
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        } />
 
 
 
 
-          <Route
+        <Route
           path="/courses/dsa" element={
             <ProtectedRoute>
-             <DSA/>
+              <DSA />
             </ProtectedRoute>
           }
         />
 
         <Route path="/courses/dsa/:languageId" element={
-            <ProtectedRoute>
-             <DSATopics/>
-            </ProtectedRoute>
-          } 
+          <ProtectedRoute>
+            <DSATopics />
+          </ProtectedRoute>
+        }
         />
-        
+
         <Route
           path="/courses/dsa/:languageId/:topic"
           element={
@@ -156,7 +160,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/streak" element={<StreakDisplay/>}/>
+        <Route path="/streak" element={<StreakDisplay />} />
       </Routes>
     </Router>
   </>
