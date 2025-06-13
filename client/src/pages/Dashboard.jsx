@@ -40,8 +40,8 @@ const navItems = [
   },
   {
     icon: <TrophyIcon className="h-6 w-6" />,
-    text: "Contests",
-    path: "/contests",
+    text: "Play Ground",
+    path: "/codeeditor",
   },
   { icon: <StarIcon className="h-6 w-6" />, text: "My Badges", path: "/my-badges" },
   {
