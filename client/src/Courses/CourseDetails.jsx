@@ -18,7 +18,6 @@ const tabs = [
   "Notes",
   "Watch Video",
   "Quiz",
-  "Coding Practice",
   "Feedback",
   "AI Assistance",
 ];
@@ -28,7 +27,7 @@ const CourseDetail = () => {
   const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topicId');
   const { user, authToken } = useContext(AuthContext);
-
+  const [startQuizLoading, setStartQuizLoading] = useState(false);
   const [courseId, setCourseId] = useState('');
   const [languageId, setLanguageId] = useState('');
   const [selectedTab, setSelectedTab] = useState('Notes');
@@ -37,9 +36,10 @@ const CourseDetail = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiNotesLoading, setAiNotesLoading] = useState(false);
   const [aiNotesResponse, setAiNotesResponse] = useState('');
+  const [generatedTopics, setGeneratedTopics] = useState({});
   const [dataLoading, setDataLoading] = useState(true);
   const [topicData, setTopicData] = useState(null);
-  const [quizData, setQuizData] = useState(null);
+  const [quizError, setQuizError] = useState(false);
   const [feedbackData, setFeedbackData] = useState([]);
   const [fetchError, setFetchError] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -47,7 +47,7 @@ const CourseDetail = () => {
   const [score, setScore] = useState(0);
   const [isTopicCompleted, setIsTopicCompleted] = useState(false);
   const [aiQuizQuestions, setAiQuizQuestions] = useState([]);
-const [aiQuizLoading, setAiQuizLoading] = useState(false);
+  const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
 
   useEffect(() => {
@@ -93,26 +93,35 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
     }
   }, [topicId]);
 
-  
-
-
   const handleAIRequest = async () => {
     if (!prompt.trim()) return;
     setAiLoading(true);
     setResponse('');
+
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+      // Basic greeting or short message detection
+      const isShortPrompt = prompt.trim().split(" ").length <= 3;
+      const finalPrompt = isShortPrompt
+        ? prompt
+        : `Reply in very simple English in 4-5 lines: ${prompt}`;
+
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: finalPrompt }] }],
+          }),
         }
       );
+
       const data = await res.json();
       const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       setResponse(aiText || "No response generated from Gemini.");
+      setPrompt(""); // Clear input box
     } catch (error) {
       console.error("AI error:", error);
       setResponse("An error occurred while fetching AI response.");
@@ -123,120 +132,157 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
 
   const generateAINotes = async () => {
-  if (!topic) return;
-  setAiNotesLoading(true);
-  setAiNotesResponse('');
+    if (!topic || aiNotesLoading) return;
 
-  try {
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    const referer = window.location.origin;
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": referer,
-        "X-Title": "EduQuiz AI Notes Generator",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "mistralai/mistral-small-3.1-24b-instruct:free",
-        messages: [
-          {
-            role: "system",
-            content: "You are an educational assistant. Generate detailed, structured notes for students."
-          },
-          {
-            role: "user",
-            content: `Generate detailed notes on the topic: "${topic}".`
-          }
-        ]
-      })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(`API error: ${data.error?.message || res.statusText}`);
+    // Return from cache if available
+    if (generatedTopics[topic]) {
+      setAiNotesResponse(generatedTopics[topic]);
+      return;
     }
 
-    const aiText = data?.choices?.[0]?.message?.content?.trim();
-    setAiNotesResponse(aiText || 'No AI-generated notes available.');
-    if (aiText) {
-      generateAIQuiz(aiText);
+    // console.log("Generating notes for:", topic);
+    setAiNotesLoading(true);
+    setAiNotesResponse('');
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      const referer = window.location.origin;
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "HTTP-Referer": referer,
+          "X-Title": "EduQuiz AI Notes Generator",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "mistralai/mistral-small-3.1-24b-instruct:free",
+          messages: [
+            {
+              role: "system",
+              content: "You are a professional educational assistant. Write clearly structured, high-quality notes for students in plain text only."
+            },
+            {
+              role: "user",
+              content: `Write well-structured educational notes on the topic: "${topic}" in plain text, limited to 2–2.5 pages.
+
+Guidelines:
+- Do NOT include the topic title or any heading at the top.
+- Use only clean **uppercase section headings** like INTRODUCTION, KEY POINTS, EXAMPLES, ADVANTAGES, APPLICATIONS, CONCLUSION.
+- Make headings visually bold and clear using spacing or line breaks (avoid markdown like **, *, or ~~).
+- Do NOT number the sections or subheadings.
+- Each section should have short, readable paragraphs (3–5 lines each).
+- Avoid extra whitespace; keep spacing clean and consistent.
+- End with a CONCLUSION section summarizing the topic.
+- Notes must be plain text, easy to export to PDF, and simple to read.`
+
+            }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(`API error: ${data.error?.message || res.statusText}`);
+      }
+
+      const aiText = data?.choices?.[0]?.message?.content?.trim();
+      if (aiText) {
+        setAiNotesResponse(aiText);
+        setGeneratedTopics(prev => ({ ...prev, [topic]: aiText }));
+        generateAIQuiz(aiText); // Optional quiz generation
+      } else {
+        setAiNotesResponse('No AI-generated notes available.');
+      }
+
+    } catch (error) {
+      console.error('AI notes generation error:', error.message);
+      setAiNotesResponse('Error generating AI notes.');
+    } finally {
+      setAiNotesLoading(false);
     }
-
-  } catch (error) {
-    console.error('AI notes generation error:', error.message);
-    setAiNotesResponse('Error generating AI notes.');
-  } finally {
-    setAiNotesLoading(false);
-  }
-};
-
-
+  };
 
   useEffect(() => {
-    if (selectedTab === 'Notes' && topicData) {
-      generateAINotes();
+    if (selectedTab === 'Notes' && topic && !generatedTopics[topic]) {
+      generateAINotes(); // run only if not already cached
     }
-  }, [selectedTab, topicData]);
-  
+  }, [selectedTab, topic]);
+
   const generateAIQuiz = async (notesText) => {
-  if (!notesText) return;
-  setAiQuizLoading(true);
+    if (!notesText) return;
+    setAiQuizLoading(true);
 
-  try {
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    const referer = window.location.origin;
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      const referer = window.location.origin;
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": referer,
-        "X-Title": "EduQuiz AI Quiz Generator",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "mistralai/mistral-small-3.1-24b-instruct:free",
-        messages: [
-          {
-            role: "system",
-            content: "You are an educational assistant. Generate 5 multiple-choice quiz questions with 4 options each, based on the provided notes. Include correct answers in JSON format.",
-          },
-          {
-            role: "user",
-            content: `Generate quiz questions for these notes:\n\n${notesText}\n\nRespond in this JSON format:\n[\n  {\n    "question": "...",\n    "options": ["A", "B", "C", "D"],\n    "correctAnswer": "B"\n  }\n]`,
-          },
-        ],
-      }),
-    });
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "HTTP-Referer": referer,
+          "X-Title": "EduQuiz AI Quiz Generator",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "mistralai/mistral-small-3.1-24b-instruct:free",
+          messages: [
+            {
+              role: "user",
+              content: `You are a smart quiz generator assistant.
 
-    const data = await res.json();
+Based on the following educational notes, generate exactly 5 multiple-choice questions (MCQs).
 
-    if (!res.ok) {
-      throw new Error(`API error: ${data.error?.message || res.statusText}`);
+Notes:
+"""
+${notesText}
+"""
+
+### Required JSON Format:
+[
+  {
+    "question": "What is ...?",
+    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+    "correctAnswer": "Option 2"
+  },
+  ...
+]
+
+### Guidelines:
+- Each question must have 4 answer options.
+- Include the correct answer in the "correctAnswer" field.
+- Respond ONLY with a valid JavaScript array of 5 questions.
+- DO NOT include any text, comments, markdown code blocks, or explanations—just raw JSON.`
+            }
+          ]
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(`API error: ${data.error?.message || res.statusText}`);
+      }
+
+      let responseText = data?.choices?.[0]?.message?.content?.trim();
+
+      // 🧼 Clean up if the model wraps the JSON in code blocks
+      if (responseText.startsWith("```json") || responseText.startsWith("```")) {
+        responseText = responseText.replace(/```json|```/g, "").trim();
+      }
+
+      const parsedQuiz = JSON.parse(responseText);
+      setAiQuizQuestions(parsedQuiz);
+    } catch (err) {
+      console.error("Error generating quiz:", err.message);
+      setAiQuizQuestions([]);
+    } finally {
+      setAiQuizLoading(false);
     }
+  };
 
-    let responseText = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!responseText) {
-      throw new Error("No valid response from AI model");
-    }
-
-    // 🧼 Clean up Markdown code block if present
-    if (responseText.startsWith("```json")) {
-      responseText = responseText.replace(/```json|```/g, "").trim();
-    }
-
-    const parsedQuiz = JSON.parse(responseText);
-    setAiQuizQuestions(parsedQuiz);
-  } catch (err) {
-    console.error("Error generating quiz:", err.message);
-    setAiQuizQuestions([]);
-  } finally {
-    setAiQuizLoading(false);
-  }
-};
 
   const handleOptionChange = (questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
@@ -308,18 +354,30 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
         return (
           <div>
             {aiNotesLoading ? (
-              <Typography>Generating AI Notes...</Typography>
+              <Typography className="text-white font-sans">Generating AI Notes...</Typography>
             ) : (
-              <Typography className="whitespace-pre-wrap">
-                {aiNotesResponse || topicData.notes}
-              </Typography>
+              <pre
+                className="whitespace-pre-wrap text-white font-sans text-base leading-relaxed"
+                style={{ fontFamily: '"Segoe UI", Roboto, Arial, sans-serif' }}
+              >
+                {aiNotesResponse || topicData?.notes || "No notes available."}
+              </pre>
             )}
+
             <Button
-              onClick={generateAINotes}
+              onClick={() => {
+                // Clear previous notes for this topic and regenerate
+                setGeneratedTopics(prev => {
+                  const updated = { ...prev };
+                  delete updated[topic];
+                  return updated;
+                });
+                generateAINotes(); // re-generate
+              }}
               disabled={aiNotesLoading}
               className="mt-4"
             >
-              Regenerate AI Notes
+              🔄 Regenerate AI Notes
             </Button>
           </div>
         );
@@ -330,9 +388,9 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
             {topicData.youtubeLinks.map((link, idx) => (
               <div key={idx} className="relative group w-full">
                 <div className="w-full h-[500px] rounded-xl overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl">
-                  <iframe 
-                    src={link} 
-                    title={`Video ${idx + 1}`} 
+                  <iframe
+                    src={link}
+                    title={`Video ${idx + 1}`}
                     className="w-full h-full rounded-xl"
                     allowFullScreen
                   />
@@ -347,17 +405,17 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 bg-[#141619] rounded-xl">
-            <svg 
-              className="w-16 h-16 text-[#B3B4BD] mb-4" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-16 h-16 text-[#B3B4BD] mb-4"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             </svg>
             <Typography className="text-[#B3B4BD]">No videos available for this topic.</Typography>
@@ -366,57 +424,125 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
       case 'Quiz':
         return (
-          <>
-            {aiQuizLoading ? (
-              <Typography>Generating Quiz Questions...</Typography>
-            ) : aiQuizQuestions.length > 0 ? (
-              <>
-                {aiQuizQuestions.map((q, idx) => (
-                  <QuizQuestion
-                    key={idx}
-                    questionIndex={idx}
-                    questionData={q}
-                    selectedOptions={selectedOptions}
-                    handleOptionChange={handleOptionChange}
-                    isSubmitted={isSubmitted}
-                  />
-                ))}
-                {!isSubmitted ? (
-                  <Button
-                    onClick={handleSubmitQuiz}
-                    className="mt-4 bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
-                  >
-                    Submit Quiz
-                  </Button>
-                ) : (
-                  <>
-                    <Typography variant="h6" className="mt-4">
-                      You scored {score} out of {aiQuizQuestions.length}
-                    </Typography>
-                    {isTopicCompleted && (
-                      <Typography className="mt-2 text-[#0A21C0]">
-                        ✅ Topic marked as completed!
-                      </Typography>
-                    )}
-                  </>
-                )}
-              </>
-            ) : (
-              <Typography>No quiz questions generated yet.</Typography>
-            )}
-          </>
-        );
+          <div className="quiz-container text-white">
+            {aiQuizQuestions.length === 0 ? (
+              aiQuizLoading ? (
+                <Typography>Generating Quiz Questions...</Typography>
+              ) : !quizError ? (
+                <Button
+                  className="bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD] flex items-center justify-center gap-2"
+                  onClick={() => {
+                    setStartQuizLoading(true);
+                    generateAIQuiz(); // trigger quiz generation
 
-      case 'Coding Practice':
-        return topicData.codingQuestions?.length > 0 ? (
-          topicData.codingQuestions.map((q, idx) => (
-            <Card key={idx} className="p-4 mb-4 shadow">
-              <Typography variant="h6">{q.title}</Typography>
-              <Typography className="mt-2 text-gray-700">{q.description}</Typography>
-            </Card>
-          ))
-        ) : (
-          <Typography>No coding practice available.</Typography>
+                    setTimeout(() => {
+                      if (aiQuizQuestions.length === 0) {
+                        setQuizError(true);
+                      }
+                      setStartQuizLoading(false);
+                    }, 5000);
+                  }}
+                >
+                  {startQuizLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        ></path>
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    "Start Quiz"
+                  )}
+                </Button>
+
+              ) : (
+                <Typography className="text-red-500 mt-4">
+                  Unable to take quiz as of now. Try again later.
+                </Typography>
+              )
+            ) : !isSubmitted ? (
+              <div>
+                <QuizQuestion
+                  questionIndex={currentQuestionIndex}
+                  questionData={aiQuizQuestions[currentQuestionIndex]}
+                  selectedOptions={selectedOptions}
+                  handleOptionChange={handleOptionChange}
+                  isSubmitted={false}
+                />
+
+                <div className="flex justify-between mt-4">
+                  <Button
+                    onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
+                    disabled={currentQuestionIndex === 0}
+                    className="bg-gray-600 text-white"
+                  >
+                    Previous
+                  </Button>
+
+                  {currentQuestionIndex === aiQuizQuestions.length - 1 ? (
+                    <Button
+                      onClick={handleSubmitQuiz}
+                      disabled={selectedOptions[currentQuestionIndex] == null}
+                      className="bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
+                    >
+                      Submit
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                      disabled={selectedOptions[currentQuestionIndex] == null}
+                      className="bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
+                    >
+                      Next
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4">
+                <Typography variant="h6">
+                  You scored {score} out of {aiQuizQuestions.length}
+                </Typography>
+
+                {isTopicCompleted && (
+                  <Typography className="mt-2 text-[#0A21C0]">
+                    ✅ Topic marked as completed!
+                  </Typography>
+                )}
+
+                <Button
+                  onClick={() => {
+                    setSelectedOptions({});
+                    setCurrentQuestionIndex(0);
+                    setIsSubmitted(false);
+                    setScore(0);
+                    setQuizError(false); // reset error state
+                    setAiQuizQuestions([]); // clear old quiz
+                  }}
+                  className="mt-4 bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
+                >
+                  Take Quiz Again
+                </Button>
+              </div>
+            )}
+          </div>
         );
 
       case 'Feedback':
@@ -435,31 +561,42 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
 
       case 'AI Assistance':
         return (
-          <>
-            <Typography className="mb-2 font-medium text-gray-700 text-sm">
+          <div className="text-white font-sans">
+            <Typography className="mb-2 font-semibold text-white text-sm">
               AI Response:
             </Typography>
-            <Card className="p-4 bg-[#141619] whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto text-[#B3B4BD]">
+
+            <Card className="p-4 bg-[#1e1f22] whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto text-white text-sm rounded-md shadow-sm">
               {response || 'AI response will appear here.'}
             </Card>
-            <Typography className="mb-2 font-medium text-gray-700 mt-4 text-sm">
+
+            <Typography className="mb-2 font-semibold text-white mt-4 text-sm">
               Ask your question about this topic:
             </Typography>
-            <div className="flex items-start gap-4">
+
+            <div className="flex flex-col sm:flex-row items-start gap-4">
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAIRequest(); // Send on Enter
+                  }
+                }}
                 rows={4}
-                className="flex-grow"
+                placeholder="Type your question here and press Enter to ask..."
+                className="flex-grow text-white bg-[#1a1a1d] border border-gray-600 rounded-md p-3 placeholder-gray-400"
               />
+
               <Button
                 onClick={handleAIRequest}
                 disabled={aiLoading || !prompt.trim()}
-                className="rounded-full bg-[#0A21C0] hover:bg-[#050A44] w-12 h-12 flex items-center justify-center p-0"
+                className="rounded-full bg-[#0A21C0] hover:bg-[#050A44] w-12 h-12 flex items-center justify-center p-0 shadow-md"
                 aria-label="Submit AI prompt"
               >
                 {aiLoading ? (
-                  <Spinner className="h-6 w-6" />
+                  <Spinner className="h-6 w-6 text-white" />
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -478,7 +615,7 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
                 )}
               </Button>
             </div>
-          </>
+          </div>
         );
 
       default:
@@ -498,11 +635,10 @@ const [aiQuizLoading, setAiQuizLoading] = useState(false);
             <ListItem
               key={tab}
               onClick={() => setSelectedTab(tab)}
-              className={`cursor-pointer rounded px-3 py-2 ${
-                selectedTab === tab
-                  ? 'bg-[#0A21C0] font-semibold text-[#B3B4BD]'
-                  : 'hover:bg-[#141619] text-[#B3B4BD]'
-              }`}
+              className={`cursor-pointer rounded px-3 py-2 ${selectedTab === tab
+                ? 'bg-[#0A21C0] font-semibold text-[#B3B4BD]'
+                : 'hover:bg-[#141619] text-[#B3B4BD]'
+                }`}
             >
               {tab}
             </ListItem>
