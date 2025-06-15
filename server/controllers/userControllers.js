@@ -4,10 +4,6 @@ const  calculateUserProgress  = require('../utils/progressCalculator.js');
 const mongoose = require('mongoose'); 
 const Topic = require('../models/Topic');
 
-
-
-
-
 exports.registerUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
@@ -122,12 +118,6 @@ exports.markTopicAsCompleted = async (req, res) => {
     res.status(500).json({ message: 'Failed to mark topic as completed', error: err.message });
   }
 };
-
-
-
-
-
-
 
 exports.getEnrolledCourses = async (req, res) => {
   try {

@@ -23,8 +23,11 @@ export default function CodeEditor() {
   const [code, setCode] = useState(lang.template);
   const [out, setOut] = useState("");
   const [isError, setIsError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1000);
     setCode(lang.template);
     setOut("");
   }, [lang]);
@@ -35,15 +38,19 @@ export default function CodeEditor() {
     try {
       const res = await axios.post(
         "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true",
-        { language_id: langId, source_code: btoa(unescape(encodeURIComponent(code))) },
+        {
+          language_id: langId,
+          source_code: btoa(unescape(encodeURIComponent(code)))
+        },
         {
           headers: {
-            "X-RapidAPI-Key": "eafbb32d17mshf48dbea8801ae8dp12eaf1jsnb9fe874f0cfd",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+            "X-RapidAPI-Key": import.meta.env.VITE_RAPIDAPI_KEY,
+            "X-RapidAPI-Host": import.meta.env.VITE_RAPIDAPI_HOST,
             "Content-Type": "application/json"
           }
         }
       );
+
       const d = res.data;
       const decode = s => decodeURIComponent(escape(atob(s || "")));
       const result = d.stdout ? decode(d.stdout) : d.stderr ? decode(d.stderr) : d.compile_output ? decode(d.compile_output) : "No output";
@@ -68,21 +75,41 @@ export default function CodeEditor() {
     a.click();
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-70"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-wrap justify-center gap-10 p-5 bg-blue-50">
-      <div className="flex-1 min-w-[500px] max-w-full bg-white rounded-lg shadow-md flex flex-col">
-        <div className="flex flex-wrap justify-between items-center p-3 bg-blue-100 gap-3">
-          <span className="font-semibold">main.{lang.ext}</span>
-          <div className="flex gap-2 flex-wrap">
-            <select
-              className="px-2 py-1 rounded border border-blue-300 bg-blue-50"
-              value={langId}
-              onChange={e => setLangId(+e.target.value)}
-            >
-              {languages.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-            </select>
-            {[["Run Code", runCode], ["Copy Code", copyCode], ["Clear Code", clearEditor], ["Download Code", downloadCode]].map(
-              ([label, fn]) => (
+    <div className="min-h-screen bg-blue-50 p-4">
+      <h1 className="text-4xl font-bold text-center text-blue-900 mb-8 tracking-wide">
+        EasyLearn - Code Editor
+      </h1>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Code Editor */}
+        <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md flex flex-col">
+          <div className="flex flex-wrap justify-between items-center p-3 bg-blue-100 gap-3">
+            <span className="font-semibold">main.{lang.ext}</span>
+            <div className="flex flex-wrap gap-2">
+              <select
+                className="px-2 py-1 rounded border border-blue-300 bg-blue-50"
+                value={langId}
+                onChange={e => setLangId(+e.target.value)}
+              >
+                {languages.map(l => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+              {[
+                ["Run Code", runCode],
+                ["Copy Code", copyCode],
+                ["Clear Code", clearEditor],
+                ["Download Code", downloadCode]
+              ].map(([label, fn]) => (
                 <button
                   key={label}
                   onClick={fn}
@@ -90,40 +117,42 @@ export default function CodeEditor() {
                 >
                   <b>{label}</b>
                 </button>
-              )
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-        <Editor
-          height="calc(100vh - 100px)"
-          language={lang.monaco}
-          theme="vs-dark"
-          value={code}
-          onChange={value => setCode(value || "")}
-          options={{
-            minimap: { enabled: false },
-            automaticLayout: true,
-            scrollBeyondLastLine: false
-          }}
-        />
-      </div>
 
-      <div className="flex-1 min-w-[500px] max-w-full bg-white rounded-lg shadow-md flex flex-col">
-        <div className="flex justify-between items-center p-3 bg-blue-100">
-          <span className="font-semibold">Output</span>
-          <button
-            onClick={clearOutput}
-            className="px-4 py-1 bg-blue-200 border border-blue-300 rounded hover:bg-blue-300"
-          >
-            <b>Clear Output</b>
-          </button>
+          <Editor
+            height="calc(80vh)"
+            language={lang.monaco}
+            theme="vs-dark"
+            value={code}
+            onChange={value => setCode(value || "")}
+            options={{
+              minimap: { enabled: false },
+              automaticLayout: true,
+              scrollBeyondLastLine: false
+            }}
+          />
         </div>
-        <pre
-          className={`flex-1 m-0 p-4 bg-black font-bold overflow-y-auto whitespace-pre-wrap ${isError ? "text-red-500" : "text-green-300"}`}
-          style={{ height: "calc(100vh - 140px)" }}
-        >
-          {out}
-        </pre>
+
+        {/* Output Panel */}
+        <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md flex flex-col">
+          <div className="flex justify-between items-center p-3 bg-blue-100">
+            <span className="font-semibold">Output</span>
+            <button
+              onClick={clearOutput}
+              className="px-4 py-1 bg-blue-200 border border-blue-300 rounded hover:bg-blue-300"
+            >
+              <b>Clear Output</b>
+            </button>
+          </div>
+          <pre
+            className={`flex-1 m-0 p-4 bg-black font-bold overflow-y-auto whitespace-pre-wrap ${isError ? "text-red-500" : "text-green-300"}`}
+            style={{ height: "calc(80vh - 48px)" }}
+          >
+            {out}
+          </pre>
+        </div>
       </div>
     </div>
   );

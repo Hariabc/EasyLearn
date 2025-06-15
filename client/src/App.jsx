@@ -54,11 +54,6 @@ function App() {
           </ProtectedRoute>
         } />
 
-        <Route path="/courses" element={
-          <ProtectedRoute>
-            <CoursesPage />
-          </ProtectedRoute>} />
-
         <Route path="/courses/computerlanguages" element={
           <ProtectedRoute>
             <ComputerLanguages />
@@ -76,8 +71,6 @@ function App() {
             <CourseDetail />
           </ProtectedRoute>
         } />
-
-
 
         <Route path="/courses/frontend" element={
           <ProtectedRoute>
@@ -133,9 +126,6 @@ function App() {
             <CourseDetail />
           </ProtectedRoute>
         } />
-
-
-
 
         <Route
           path="/courses/dsa" element={

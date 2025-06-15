@@ -8,19 +8,18 @@ import {
   XMarkIcon,
   AcademicCapIcon,
   ClipboardDocumentListIcon,
-  TrophyIcon,
-  StarIcon,
   ChatBubbleLeftRightIcon,
   Squares2X2Icon,
   Cog6ToothIcon,
   UserCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CodeBracketIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/solid";
 import logo from "../assets/education_10353866.png";
 import api from "../axios";
 import StreakDisplay from "../components/StreakDisplay";
-
 
 const navItems = [
   {
@@ -34,23 +33,21 @@ const navItems = [
     path: "/my-courses",
   },
   {
-    icon: <ClipboardDocumentListIcon className="h-6 w-6" />,
-    text: "Quizzes",
-    path: "/quizzes",
-  },
-  {
-    icon: <TrophyIcon className="h-6 w-6" />,
-    text: "Play Ground",
+    icon: <CodeBracketIcon className="h-6 w-6" />,
+    text: "Code Playground",
     path: "/codeeditor",
   },
-  { icon: <StarIcon className="h-6 w-6" />, text: "My Badges", path: "/my-badges" },
+  {
+    icon: <SparklesIcon className="h-6 w-6" />,
+    text: "My Badges",
+    path: "/my-badges",
+  },
   {
     icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />,
     text: "Discussion Forum",
     path: "/forum",
   },
 ];
-
 
 const Dashboard = () => {
   const { user, loading, logout, authToken } = useContext(AuthContext);
@@ -102,8 +99,8 @@ const Dashboard = () => {
             api.get("/api/courses"),
             user?._id && authToken
               ? api.get(`/api/users/${user._id}`, {
-                  headers: { Authorization: `Bearer ${authToken}` },
-                })
+                headers: { Authorization: `Bearer ${authToken}` },
+              })
               : Promise.resolve({ data: { enrolledCourses: [] } }),
           ]);
 
@@ -204,23 +201,20 @@ const Dashboard = () => {
     <div className="flex h-screen bg-slate-800">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col ${
-          isDesktopSidebarExpanded ? "w-64" : "w-20"
-        } bg-slate-900 shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
+        className={`hidden lg:flex flex-col ${isDesktopSidebarExpanded ? "w-64" : "w-20"
+          } bg-slate-900 shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div
-            className={`flex items-center ${
-              isDesktopSidebarExpanded
-                ? "justify-between px-6"
-                : "justify-center px-2"
-            } py-5 border-b border-slate-700`}
+            className={`flex items-center ${isDesktopSidebarExpanded
+              ? "justify-between px-6"
+              : "justify-center px-2"
+              } py-5 border-b border-slate-700`}
           >
             <div
-              className={`flex items-center ${
-                isDesktopSidebarExpanded ? "gap-3" : ""
-              }`}
+              className={`flex items-center ${isDesktopSidebarExpanded ? "gap-3" : ""
+                }`}
             >
               {isDesktopSidebarExpanded && (
                 <span className="text-xl font-semibold tracking-tight text-white">
@@ -230,9 +224,8 @@ const Dashboard = () => {
             </div>
             <button
               onClick={toggleDesktopSidebar}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none ${
-                !isDesktopSidebarExpanded ? "lg:mx-auto" : ""
-              }`}
+              className={`p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none ${!isDesktopSidebarExpanded ? "lg:mx-auto" : ""
+                }`}
               aria-label="Toggle desktop sidebar"
             >
               {isDesktopSidebarExpanded ? (
@@ -252,9 +245,8 @@ const Dashboard = () => {
                   e.preventDefault();
                   handleNavigationClick(item.path);
                 }}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${
-                  !isDesktopSidebarExpanded ? "justify-center" : ""
-                }`}
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${!isDesktopSidebarExpanded ? "justify-center" : ""
+                  }`}
               >
                 <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
                   {item.icon}
@@ -336,9 +328,8 @@ const Dashboard = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${
-          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         aria-label="Mobile Sidebar"
       >
         <div className="flex flex-col h-full">
@@ -409,7 +400,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
         <div className="mb-5">
-        <StreakDisplay/>
+          <StreakDisplay />
         </div>
         {/* Mobile Header with Hamburger */}
         <div className="lg:hidden flex items-center mb-4">

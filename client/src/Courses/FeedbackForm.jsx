@@ -42,7 +42,7 @@ const FeedbackForm = ({ topicId, userId }) => {
                 rating: averageRating,
             };
 
-            await axios.post(`http://localhost:5000/api/feedbacks/${topicId}`, payload);
+            await axios.post(`/api/feedbacks/${topicId}`, payload);
 
             // Reset form fields
             setRatings(Array(questions.length).fill(0));
