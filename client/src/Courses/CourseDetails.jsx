@@ -13,6 +13,8 @@ import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import QuizQuestion from "../components/QuizComponent";
 import { AuthContext } from "../context/AuthContext";
 import api from "../axios";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const tabs = [
   "Notes",
@@ -39,6 +41,7 @@ const CourseDetail = () => {
   const [generatedTopics, setGeneratedTopics] = useState({});
   const [dataLoading, setDataLoading] = useState(true);
   const [topicData, setTopicData] = useState(null);
+  const [languageName, setLanguageName] = useState('');
   const [quizError, setQuizError] = useState(false);
   const [feedbackData, setFeedbackData] = useState([]);
   const [fetchError, setFetchError] = useState(null);
@@ -53,12 +56,20 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchTopicDetails = async () => {
       try {
+        // console.log('Fetching topic details for topicId:', topicId);
         const res = await api.get(`/api/topics/topicById/${topicId}`);
         const data = res.data;
         setTopicData(data);
         setCourseId(data.course);
         setLanguageId(data.language);
+        // console.log('Topic data fetched, languageId:', data.language);
+
+        // Fetch language name
+        const langRes = await api.get(`/api/languages/byId/${data.language}`);
+        setLanguageName(langRes.data.name);
+        // console.log('Language name fetched:', langRes.data.name);
       } catch (err) {
+        // console.error('Error fetching topic or language details:', err);
         setFetchError(err.message);
       } finally {
         setDataLoading(false);
@@ -141,6 +152,7 @@ const CourseDetail = () => {
     }
 
     // console.log("Generating notes for:", topic);
+    console.log('Attempting to generate AI notes for topic:', topic, 'in language:', languageName);
     setAiNotesLoading(true);
     setAiNotesResponse('');
 
@@ -161,22 +173,20 @@ const CourseDetail = () => {
           messages: [
             {
               role: "system",
-              content: "You are a professional educational assistant. Write clearly structured, high-quality notes for students in plain text only."
+              content: "You are a professional educational assistant. Write clearly structured, high-quality notes for students. Use Markdown for headings and code blocks."
             },
             {
               role: "user",
-              content: `Write well-structured educational notes on the topic: "${topic}" in plain text, limited to 2–2.5 pages.
+              content: `Write well-structured educational notes on the topic: "${topic}" in markdown format, limited to 2–2.5 pages.
+Generate the notes in ${languageName} language.
 
 Guidelines:
-- Do NOT include the topic title or any heading at the top.
-- Use only clean **uppercase section headings** like INTRODUCTION, KEY POINTS, EXAMPLES, ADVANTAGES, APPLICATIONS, CONCLUSION.
-- Make headings visually bold and clear using spacing or line breaks (avoid markdown like **, *, or ~~).
-- Do NOT number the sections or subheadings.
+- Do NOT include the topic title at the very top.
+- Use Markdown headings (e.g., #, ##, ###) for sections and subheadings. Avoid numbering.
 - Each section should have short, readable paragraphs (3–5 lines each).
 - Avoid extra whitespace; keep spacing clean and consistent.
-- End with a CONCLUSION section summarizing the topic.
-- Notes must be plain text, easy to export to PDF, and simple to read.`
-
+- End with a "CONCLUSION" section summarizing the topic.
+- Ensure the notes are easy to read and suitable for export.`
             }
           ]
         })
@@ -205,10 +215,10 @@ Guidelines:
   };
 
   useEffect(() => {
-    if (selectedTab === 'Notes' && topic && !generatedTopics[topic]) {
-      generateAINotes(); // run only if not already cached
+    if (selectedTab === 'Notes' && topic && !generatedTopics[topic] && languageName) {
+      generateAINotes(); // run only if not already cached and language name is available
     }
-  }, [selectedTab, topic]);
+  }, [selectedTab, topic, languageName]);
 
   const generateAIQuiz = async (notesText) => {
     if (!notesText) return;
@@ -356,12 +366,14 @@ ${notesText}
             {aiNotesLoading ? (
               <Typography className="text-white font-sans">Generating AI Notes...</Typography>
             ) : (
-              <pre
-                className="whitespace-pre-wrap text-white font-sans text-base leading-relaxed"
+              <div
+                className="text-white font-sans text-base leading-relaxed"
                 style={{ fontFamily: '"Segoe UI", Roboto, Arial, sans-serif' }}
               >
-                {aiNotesResponse || topicData?.notes || "No notes available."}
-              </pre>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {aiNotesResponse || topicData?.notes || "No notes available."}
+                </ReactMarkdown>
+              </div>
             )}
 
             <Button
@@ -624,7 +636,7 @@ ${notesText}
   };
 
   return (
-    <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[90vh] bg-[#141619]">
+    <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[100vh] bg-[#141619]">
       {/* Sidebar */}
       <div className="w-full md:w-1/4 bg-[#2C2E3A] shadow-lg rounded p-4">
         <Typography variant="h6" className="mb-4 capitalize text-[#B3B4BD]">

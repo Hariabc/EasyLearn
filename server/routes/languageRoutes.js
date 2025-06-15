@@ -1,11 +1,12 @@
 const express = require('express');
-const { getLanguagesByCourse } = require('../controllers/languageController.js');
+const { getLanguagesByCourse, getLanguageById } = require('../controllers/languageController.js');
 
 
 
 const router = express.Router();
 
 router.get('/:courseId', getLanguagesByCourse);
+router.get('/byId/:id', getLanguageById);
 
 
 
