@@ -12,9 +12,9 @@ import {
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import QuizQuestion from "../components/QuizComponent";
 import { AuthContext } from "../context/AuthContext";
+import FeedbackForm from "../Courses/FeedbackForm"
 import api from "../axios";
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 const tabs = [
   "Notes",
@@ -51,6 +51,7 @@ const CourseDetail = () => {
   const [isTopicCompleted, setIsTopicCompleted] = useState(false);
   const [aiQuizQuestions, setAiQuizQuestions] = useState([]);
   const [aiQuizLoading, setAiQuizLoading] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
 
   useEffect(() => {
@@ -88,14 +89,14 @@ const CourseDetail = () => {
     //   }
     // };
 
-    const fetchFeedbackData = async () => {
-      try {
-        const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
-        setFeedbackData(res.data);
-      } catch (err) {
-        console.error("Feedback fetch error:", err);
-      }
-    };
+    // const fetchFeedbackData = async () => {
+    //   try {
+    //     const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
+    //     setFeedbackData(res.data);
+    //   } catch (err) {
+    //     console.error("Feedback fetch error:", err);
+    //   }
+    // };
 
     if (topicId) {
       fetchTopicDetails();
@@ -103,6 +104,15 @@ const CourseDetail = () => {
       fetchFeedbackData();
     }
   }, [topicId]);
+
+  const fetchFeedbackData = async () => {
+    try {
+      const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
+      setFeedbackData(res.data);
+    } catch (err) {
+      console.error("Feedback fetch error:", err);
+    }
+  };
 
   const handleAIRequest = async () => {
     if (!prompt.trim()) return;
@@ -141,7 +151,6 @@ const CourseDetail = () => {
     }
   };
 
-
   const generateAINotes = async () => {
     if (!topic || aiNotesLoading) return;
 
@@ -151,7 +160,7 @@ const CourseDetail = () => {
       return;
     }
 
-    // console.log("Generating notes for:", topic);
+    console.log("Generating notes for:", user._id);
     console.log('Attempting to generate AI notes for topic:', topic, 'in language:', languageName);
     setAiNotesLoading(true);
     setAiNotesResponse('');
@@ -177,16 +186,21 @@ const CourseDetail = () => {
             },
             {
               role: "user",
-              content: `Write well-structured educational notes on the topic: "${topic}" in markdown format, limited to 2–2.5 pages.
-Generate the notes in ${languageName} language.
+              content: `Write well-structured educational notes for the topic: "${topic}" in Markdown format.
 
 Guidelines:
-- Do NOT include the topic title at the very top.
-- Use Markdown headings (e.g., #, ##, ###) for sections and subheadings. Avoid numbering.
-- Each section should have short, readable paragraphs (3–5 lines each).
-- Avoid extra whitespace; keep spacing clean and consistent.
-- End with a "CONCLUSION" section summarizing the topic.
-- Ensure the notes are easy to read and suitable for export.`
+- Do NOT include the topic title at the top.
+- Use section headings in **uppercase bold text**, like **INTRODUCTION**, **KEY POINTS**, **EXAMPLES**, etc.
+- Add a blank line **after each heading** to separate it from the content.
+- Write short, clear paragraphs (3–4 lines max) and separate them with line breaks for readability.
+- Use bullet points where appropriate (e.g., in KEY POINTS, ADVANTAGES).
+- For code examples, use triple backticks (\\\`\\\`\\\`) to format Markdown code blocks.
+- Include simple code examples in the EXAMPLES section to aid understanding.
+- Keep the tone student-friendly, clean, and easy to follow.
+- Do NOT use numbered sections or extra formatting like italics or underlines.
+- Finish with a **CONCLUSION** summarizing the topic.
+
+Language: ${languageName}`
             }
           ]
         })
@@ -220,9 +234,17 @@ Guidelines:
     }
   }, [selectedTab, topic, languageName]);
 
+
   const generateAIQuiz = async (notesText) => {
-    if (!notesText) return;
+    if (!notesText || notesText.trim().length < 10) {
+      console.warn("⚠️ No sufficient notes provided to generate quiz.");
+      setQuizError(true);
+      setAiQuizLoading(false);
+      return;
+    }
+
     setAiQuizLoading(true);
+    setQuizError(false);
 
     try {
       const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
@@ -271,23 +293,30 @@ ${notesText}
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(`API error: ${data.error?.message || res.statusText}`);
       }
 
       let responseText = data?.choices?.[0]?.message?.content?.trim();
+      console.log("🧪 Raw model response:", responseText);
 
-      // 🧼 Clean up if the model wraps the JSON in code blocks
-      if (responseText.startsWith("```json") || responseText.startsWith("```")) {
+      if (!responseText) throw new Error("Empty response from model.");
+
+      if (responseText.startsWith("```")) {
         responseText = responseText.replace(/```json|```/g, "").trim();
       }
 
       const parsedQuiz = JSON.parse(responseText);
+      if (!Array.isArray(parsedQuiz) || parsedQuiz.length !== 5) {
+        throw new Error("Quiz format invalid or incomplete.");
+      }
+
+      console.log("✅ Parsed quiz questions:", parsedQuiz);
       setAiQuizQuestions(parsedQuiz);
     } catch (err) {
-      console.error("Error generating quiz:", err.message);
+      console.error("❌ Error generating quiz:", err);
       setAiQuizQuestions([]);
+      setQuizError(true);
     } finally {
       setAiQuizLoading(false);
     }
@@ -370,9 +399,11 @@ ${notesText}
                 className="text-white font-sans text-base leading-relaxed"
                 style={{ fontFamily: '"Segoe UI", Roboto, Arial, sans-serif' }}
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {aiNotesResponse || topicData?.notes || "No notes available."}
-                </ReactMarkdown>
+                <div className="prose prose-invert text-white max-w-none">
+                  <ReactMarkdown>
+                    {aiNotesResponse}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
 
@@ -443,16 +474,21 @@ ${notesText}
               ) : !quizError ? (
                 <Button
                   className="bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD] flex items-center justify-center gap-2"
-                  onClick={() => {
+                  onClick={async () => {
                     setStartQuizLoading(true);
-                    generateAIQuiz(); // trigger quiz generation
+                    setQuizError(false);
 
-                    setTimeout(() => {
+                    try {
+                      await generateAIQuiz(); // ensure this returns a Promise
+
                       if (aiQuizQuestions.length === 0) {
                         setQuizError(true);
                       }
+                    } catch (error) {
+                      setQuizError(true);
+                    } finally {
                       setStartQuizLoading(false);
-                    }, 5000);
+                    }
                   }}
                 >
                   {startQuizLoading ? (
@@ -477,13 +513,12 @@ ${notesText}
                           d="M4 12a8 8 0 018-8v8z"
                         ></path>
                       </svg>
-                      Generating...
+                      <span className="ml-2">Generating...</span>
                     </>
                   ) : (
                     "Start Quiz"
                   )}
                 </Button>
-
               ) : (
                 <Typography className="text-red-500 mt-4">
                   Unable to take quiz as of now. Try again later.
@@ -545,8 +580,8 @@ ${notesText}
                     setCurrentQuestionIndex(0);
                     setIsSubmitted(false);
                     setScore(0);
-                    setQuizError(false); // reset error state
-                    setAiQuizQuestions([]); // clear old quiz
+                    setQuizError(false);
+                    setAiQuizQuestions([]);
                   }}
                   className="mt-4 bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
                 >
@@ -558,17 +593,14 @@ ${notesText}
         );
 
       case 'Feedback':
-        return feedbackData.length > 0 ? (
-          feedbackData.map((fb, idx) => (
-            <Card key={idx} className="p-4 mb-4 shadow">
-              <Typography className="text-sm font-semibold">
-                Rating: <Rating value={fb.rating} readonly />
-              </Typography>
-              <Typography className="mt-2 text-gray-700">{fb.comment}</Typography>
-            </Card>
-          ))
+        return topicData?._id ? (
+          <FeedbackForm
+            topicId={topic}
+            userId={user._id}
+            fetchFeedbackData={fetchFeedbackData}
+          />
         ) : (
-          <Typography>No feedback available for this topic.</Typography>
+          <Typography>Loading feedback section...</Typography>
         );
 
       case 'AI Assistance':

@@ -11,14 +11,6 @@ const quizRoutes = require('./routes/quizRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const streakRoutes = require('./routes/streakRoutes');
 
-
-
-
-
-
-
-
-
 // Load environment variables
 dotenv.config();
 
@@ -29,7 +21,6 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-
 
 // CORS setup — add your frontend URL here
 app.use(cors({
@@ -54,14 +45,10 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
 app.use('/api/streaks', streakRoutes);
 
-
-
-
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
