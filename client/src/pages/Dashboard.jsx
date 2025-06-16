@@ -478,7 +478,7 @@ const Dashboard = () => {
                     className="border border-slate-700 bg-slate-800 p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
                   >
                     <h4 className="text-lg font-bold text-white mb-2">
-                      {course.title}
+                      {course.course?.title}
                     </h4>
                     <p className="text-sm text-gray-400 mb-4">
                       Includes videos, notes, quizzes, and coding challenges.
