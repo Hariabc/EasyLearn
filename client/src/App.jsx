@@ -42,6 +42,12 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/courses" element={
+          <ProtectedRoute>
+            <CoursesPage />
+          </ProtectedRoute>
+        } />
+
         <Route path="/codeeditor" element={
           <ProtectedRoute>
             <CodeEditor />

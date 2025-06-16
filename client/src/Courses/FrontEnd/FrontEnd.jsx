@@ -10,16 +10,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../axios';
 
-// You can use a language icon library or fallback to emojis
-const languageAvatars = {
-  JavaScript: "🟨",
-  Python: "🐍",
-  HTML: "🌐",
-  CSS: "🎨",
-  Java: "☕",
-  // Add more mappings as needed
-};
-
 const Frontend = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,13 +22,11 @@ const Frontend = () => {
 
   const { user, authToken } = useContext(AuthContext);
 
-  // Fetch languages for the course
   const fetchLanguages = async () => {
     const res = await api.get(`/api/languages/${courseId}`);
     return res.data;
   };
 
-  // Fetch user data with progress
   const fetchUserProgress = async () => {
     const res = await api.get(`/api/users/${user._id}`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -98,67 +86,69 @@ const Frontend = () => {
     )?.length || 0;
 
   return (
-    <div className="bg-slate-900 min-h-screen p-6">
-      <div className="px-8 pb-2">
-        <Typography variant="h3" className="mb-1 text-white font-bold">
+    <div className="bg-slate-900 min-h-screen py-6 px-4 sm:px-10">
+      <div className="mb-6">
+        <Typography variant="h4" className="text-white font-bold">
           Languages
         </Typography>
         <Typography variant="small" className="text-gray-300">
-          <span className="font-semibold text-blue-400">{completedLanguages}</span> of <span className="font-semibold text-white">{totalLanguages}</span> languages completed
+          <span className="text-blue-400 font-semibold">{completedLanguages}</span> of{' '}
+          <span className="text-white font-semibold">{totalLanguages}</span> languages completed
         </Typography>
       </div>
 
-      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {languages.map(({ _id, name, description }) => {
+      <div className="flex flex-wrap gap-6 justify-center">
+        {languages.map(({ _id, name, description }, index) => {
           const progressEntry = userCourseProgress?.languages?.find(
-            (lang) =>
-              String(lang.language?._id || lang.language) === String(_id)
+            (lang) => String(lang.language?._id || lang.language) === String(_id)
           );
-          // Ensure percent is always a valid number
           const percent = Number.isFinite(progressEntry?.completionPercent)
             ? progressEntry.completionPercent
             : 0;
           const isCompleted = percent === 100;
 
           return (
-            <Card
+            <div
               key={_id}
-              className={`shadow-lg cursor-pointer hover:shadow-2xl transition-transform duration-200 hover:-translate-y-1 border-2 ${
-                isCompleted ? "border-green-400" : "border-transparent"
-              } bg-slate-800`}
+              className={`w-full sm:w-[47%] lg:w-[30%] ${index >= 3 ? 'mt-4' : ''}`}
               onClick={() => handleClick(_id)}
-              style={{ minHeight: 230 }}
             >
-              <CardHeader
-                floated={false}
-                className="flex flex-col items-center justify-center bg-blue-600 py-6 rounded-t-lg"
+              <Card
+                className={`bg-slate-800 rounded-2xl border-2 hover:shadow-2xl hover:scale-[1.03] transition-transform duration-200 cursor-pointer ${
+                  isCompleted ? 'border-green-400' : 'border-slate-700'
+                }`}
               >
-                <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow mb-2 text-black">
-                  {languageAvatars[name] || "📘"}
-                </div>
-                <Typography variant="h5" className="text-white font-bold mt-1">
-                  {name}
-                </Typography>
-              </CardHeader>
-              <CardBody>
-                <Typography variant="small" className="mb-3 text-gray-400 min-h-[40px]">
-                  {description || `Explore ${name} programming language tutorials and resources.`}
-                </Typography>
-                <div className="mt-2">
-                  <Progress
-                    value={percent}
-                    color={isCompleted ? 'green-400' : 'blue-400'}
-                    className="h-3 bg-white"
-                  />
-                  <Typography
-                    variant="small"
-                    className={`text-right mt-1 ${isCompleted ? "text-green-400 font-semibold" : "text-gray-400"}`}
-                  >
-                    {percent}% completed
+                <CardHeader
+                  floated={false}
+                  shadow={false}
+                  className="flex items-center justify-center bg-blue-600 py-6 rounded-t-2xl"
+                >
+                  <Typography className="text-white text-xl font-bold">
+                    {name}
                   </Typography>
-                </div>
-              </CardBody>
-            </Card>
+                </CardHeader>
+                <CardBody className="px-5 py-4">
+                  <Typography className="text-gray-300 text-sm min-h-[48px] line-clamp-2">
+                    {description || `Explore ${name} tutorials and resources.`}
+                  </Typography>
+                  <div className="mt-4">
+                    <Progress
+                      value={percent}
+                      color={isCompleted ? 'green' : 'blue'}
+                      className="h-3 bg-white rounded-full"
+                    />
+                    <Typography
+                      variant="small"
+                      className={`text-right mt-1 text-xs ${
+                        isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
+                      }`}
+                    >
+                      {percent}% completed
+                    </Typography>
+                  </div>
+                </CardBody>
+              </Card>
+            </div>
           );
         })}
       </div>
@@ -167,3 +157,4 @@ const Frontend = () => {
 };
 
 export default Frontend;
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 
+// ✅ Language list
 const languages = [
   { id: 50, name: "C", ext: "c", monaco: "c", template: `#include <stdio.h>\n\nint main() {\n  printf("Hello, World!\\n");\n  return 0;\n}` },
   { id: 54, name: "C++", ext: "cpp", monaco: "cpp", template: `#include <iostream>\nusing namespace std;\nint main() {\n  cout << "Hello, World!\\n";\n  return 0;\n}` },
@@ -13,24 +14,22 @@ const languages = [
   { id: 88, name: "Swift", ext: "swift", monaco: "swift", template: `print("Hello, World!")` },
   { id: 74, name: "TypeScript", ext: "ts", monaco: "typescript", template: `console.log("Hello, World!");` },
   { id: 60, name: "Go", ext: "go", monaco: "go", template: `package main\nimport "fmt"\nfunc main() {\n  fmt.Println("Hello, World!")\n}` },
-  { id: 78, name: "Kotlin", ext: "kt", monaco: "kotlin", template: `fun main() {\n  println("Hello, World!")\n}` },
-  { id: 68, name: "PHP", ext: "php", monaco: "php", template: `<?php\n echo "Hello, World!";\n?>` }
+  { id: 78, name: "Kotlin", ext: "kt", monaco: "kotlin", template: `fun main() {\n  println("Hello, World!")\n}` }
 ];
 
 export default function CodeEditor() {
   const [langId, setLangId] = useState(50);
-  const lang = languages.find(l => l.id === langId);
-  const [code, setCode] = useState(lang.template);
+  const [code, setCode] = useState(languages.find(l => l.id === 50).template);
   const [out, setOut] = useState("");
   const [isError, setIsError] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1000);
-    setCode(lang.template);
+    const selectedLang = languages.find(l => l.id === langId);
+    setCode(selectedLang.template);
     setOut("");
-  }, [lang]);
+  }, [langId]);
+
+  const lang = languages.find(l => l.id === langId);
 
   const runCode = async () => {
     setOut("Running...");
@@ -64,9 +63,7 @@ export default function CodeEditor() {
 
   const clearEditor = () => setCode("");
   const clearOutput = () => setOut("");
-  const copyCode = () => navigator.clipboard.writeText(code)
-    .then(() => alert("Code copied to clipboard!"))
-    .catch(() => alert("Failed to copy code"));
+  const copyCode = () => navigator.clipboard.writeText(code).then(() => alert("Code copied!"));
   const downloadCode = () => {
     const blob = new Blob([code], { type: "text/plain" });
     const a = document.createElement("a");
@@ -75,28 +72,20 @@ export default function CodeEditor() {
     a.click();
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-70"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-blue-50 p-4">
-      <h1 className="text-4xl font-bold text-center text-blue-900 mb-8 tracking-wide">
+    <div className="min-h-screen bg-slate-900 text-white p-4">
+      <h1 className="text-4xl font-bold text-center mb-10 tracking-wide text-white">
         EasyLearn - Code Editor
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Code Editor */}
-        <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md flex flex-col">
-          <div className="flex flex-wrap justify-between items-center p-3 bg-blue-100 gap-3">
-            <span className="font-semibold">main.{lang.ext}</span>
+        {/* Editor Section */}
+        <div className="w-full lg:w-1/2 bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+          <div className="flex flex-wrap justify-between items-center p-4 bg-slate-700 border-b border-slate-600 gap-3">
+            <span className="text-white font-medium">main.{lang.ext}</span>
             <div className="flex flex-wrap gap-2">
               <select
-                className="px-2 py-1 rounded border border-blue-300 bg-blue-50"
+                className="px-3 py-1 rounded-lg bg-slate-600 text-white border border-slate-500"
                 value={langId}
                 onChange={e => setLangId(+e.target.value)}
               >
@@ -104,18 +93,13 @@ export default function CodeEditor() {
                   <option key={l.id} value={l.id}>{l.name}</option>
                 ))}
               </select>
-              {[
-                ["Run Code", runCode],
-                ["Copy Code", copyCode],
-                ["Clear Code", clearEditor],
-                ["Download Code", downloadCode]
-              ].map(([label, fn]) => (
+              {[["Run Code", runCode], ["Copy Code", copyCode], ["Clear Code", clearEditor], ["Download Code", downloadCode]].map(([label, fn]) => (
                 <button
                   key={label}
                   onClick={fn}
-                  className="px-4 py-1 bg-blue-200 border border-blue-300 rounded hover:bg-blue-300"
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold"
                 >
-                  <b>{label}</b>
+                  {label}
                 </button>
               ))}
             </div>
@@ -135,20 +119,20 @@ export default function CodeEditor() {
           />
         </div>
 
-        {/* Output Panel */}
-        <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md flex flex-col">
-          <div className="flex justify-between items-center p-3 bg-blue-100">
-            <span className="font-semibold">Output</span>
+        {/* Output Section */}
+        <div className="w-full lg:w-1/2 bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+          <div className="flex justify-between items-center p-4 bg-slate-700 border-b border-slate-600">
+            <span className="text-white font-medium">Output</span>
             <button
               onClick={clearOutput}
-              className="px-4 py-1 bg-blue-200 border border-blue-300 rounded hover:bg-blue-300"
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold"
             >
-              <b>Clear Output</b>
+              Clear
             </button>
           </div>
           <pre
-            className={`flex-1 m-0 p-4 bg-black font-bold overflow-y-auto whitespace-pre-wrap ${isError ? "text-red-500" : "text-green-300"}`}
-            style={{ height: "calc(80vh - 48px)" }}
+            className={`p-4 flex-1 overflow-y-auto whitespace-pre-wrap font-semibold text-sm ${isError ? "text-red-400" : "text-green-300"}`}
+            style={{ height: "calc(80vh - 48px)", backgroundColor: "#1e293b" }}
           >
             {out}
           </pre>

@@ -4,103 +4,122 @@ import { Card, CardBody, Typography, Progress } from '@material-tailwind/react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../axios';
 
-
 const DSATopics = () => {
   const { languageId } = useParams();
   const navigate = useNavigate();
+  const { user, authToken } = useContext(AuthContext);
+
   const [topics, setTopics] = useState([]);
-  const [userLanguageProgress, setUserLanguageProgress] = useState(null);
+  const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user, authToken } = useContext(AuthContext);
 
   useEffect(() => {
     if (!user || !authToken) return;
 
-    const fetchData = async () => {
+    const fetchTopicsAndProgress = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch topics
-        const topicsRes = await api.get(`/api/topics/${languageId}`);
-        
+        const [topicsRes, userRes] = await Promise.all([
+          api.get(`/api/topics/${languageId}`),
+          api.get(`/api/users/${user._id}`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }),
+        ]);
+
         setTopics(topicsRes.data);
 
-        // Fetch user progress
-        const userRes = await api.get(`/api/users/${user._id}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-       const userData = userRes.data;
-
-        // Match progress for the specific language
-        const course = userData.enrolledCourses.find(c =>
-          c.languages?.some(lang =>
+        const course = userRes.data.enrolledCourses.find((c) =>
+          c.languages?.some((lang) =>
             typeof lang.language === 'string'
               ? lang.language === languageId
               : lang.language?._id === languageId
           )
         );
 
-        const languageProgress = course?.languages.find(lang =>
+        const progress = course?.languages.find((lang) =>
           typeof lang.language === 'string'
             ? lang.language === languageId
             : lang.language?._id === languageId
         );
 
-        setUserLanguageProgress(languageProgress || null);
+        setUserProgress(progress || null);
       } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err.message);
+        console.error('Error fetching data:', err);
+        setError('Unable to load topics. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [user?._id, authToken, languageId]);
+    fetchTopicsAndProgress();
+  }, [user, authToken, languageId]);
 
   const handleTopicClick = (topic) => {
-    const topicParam = topic.title.toLowerCase().replace(/\s+/g, '-');
-    navigate(`/courses/dsa/${languageId}/${topicParam}?topicId=${topic._id}`);
+    const topicSlug = topic.title.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/courses/dsa/${languageId}/${topicSlug}?topicId=${topic._id}`);
   };
 
-  if (loading) return <div className="p-8">Loading topics...</div>;
-  if (error) return <div className="p-8 text-red-600">Error: {error}</div>;
-
   const totalTopics = topics.length;
-  const completedTopicsCount = userLanguageProgress?.completedTopics?.length || 0;
+  const completedCount = userProgress?.completedTopics?.length || 0;
+
+  if (loading) {
+    return (
+      <div className="p-8 text-blue-400 font-medium animate-pulse">
+        Loading topics...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-red-400 font-medium">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8">
-      <Typography variant="h4" className="mb-1">Topics</Typography>
-      <Typography variant="small" className="text-gray-700 mb-4">
-        {completedTopicsCount} of {totalTopics} topics completed
+    <div className="bg-slate-900 min-h-screen p-8">
+      <Typography variant="h4" className="text-white font-bold mb-1">
+        DSA Course Topics
+      </Typography>
+      <Typography variant="small" className="text-gray-300 mb-6">
+        Progress: <span className="text-blue-400 font-semibold">{completedCount}</span> / <span className="text-white font-semibold">{totalTopics}</span> topics completed
       </Typography>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {topics.map((topic) => {
-          const isCompleted = userLanguageProgress?.completedTopics?.includes(topic._id);
+          const isCompleted = userProgress?.completedTopics?.includes(topic._id);
           const percent = isCompleted ? 100 : 0;
 
           return (
             <Card
               key={topic._id}
-              className="cursor-pointer hover:shadow-xl transition"
+              className="cursor-pointer hover:shadow-xl transition border border-slate-700 bg-slate-800"
               onClick={() => handleTopicClick(topic)}
             >
               <CardBody>
-                <Typography variant="h6">{topic.title}</Typography>
-                <Typography variant="small">Click to explore {topic.title}</Typography>
+                <Typography variant="h6" className="text-white mb-1">
+                  {topic.title}
+                </Typography>
+                <Typography variant="small" className="text-gray-400 mb-2">
+                  Click to view details
+                </Typography>
 
-                <div className="mt-2">
-                  <Progress value={percent} color={percent === 100 ? 'green' : 'blue'} />
-                  <Typography variant="small" className="text-right mt-1 text-gray-600">
-                    {percent}% completed
-                  </Typography>
-                </div>
+                <Progress
+                  value={percent}
+                  color={percent === 100 ? 'green' : 'blue'}
+                  className="h-3 bg-white"
+                />
+                <Typography
+                  variant="small"
+                  className={`text-right mt-1 ${isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'}`}
+                >
+                  {percent}% completed
+                </Typography>
               </CardBody>
             </Card>
           );

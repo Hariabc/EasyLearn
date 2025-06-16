@@ -1,23 +1,29 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, CardHeader, CardBody, Typography, Progress } from '@material-tailwind/react';
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Typography,
+  Progress,
+} from '@material-tailwind/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../axios';
-
 
 const DSA = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const courseId = searchParams.get('id');
+
   const [languages, setLanguages] = useState([]);
   const [userCourseProgress, setUserCourseProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const { user, authToken } = useContext(AuthContext);
 
   const fetchLanguages = async () => {
     const res = await api.get(`/api/languages/${courseId}`);
-   
     return res.data;
   };
 
@@ -25,9 +31,10 @@ const DSA = () => {
     const res = await api.get(`/api/users/${user._id}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
-  
-    const data = await res.data;
-    const progress = data.enrolledCourses.find(c => c.course._id === courseId);
+    const data = res.data;
+    const progress = data.enrolledCourses.find(
+      (c) => c.course._id === courseId
+    );
     return progress || null;
   };
 
@@ -35,16 +42,20 @@ const DSA = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [langs, progress] = await Promise.all([fetchLanguages(), fetchUserProgress()]);
+        const [langs, progress] = await Promise.all([
+          fetchLanguages(),
+          fetchUserProgress(),
+        ]);
         setLanguages(langs);
         setUserCourseProgress(progress);
         setError(null);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Failed to load data');
       } finally {
         setLoading(false);
       }
     };
+
     if (courseId && user && authToken) {
       fetchData();
     }
@@ -54,55 +65,94 @@ const DSA = () => {
     navigate(`/courses/dsa/${languageId}`);
   };
 
-  if (loading) return <div>Loading DSA languages...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (!user) return <div>Loading user data...</div>;
+  if (loading)
+    return (
+      <div className="p-8 text-center text-blue-400 font-semibold animate-pulse">
+        Loading DSA topics...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="p-8 text-center text-red-400 font-semibold">
+        Error: {error}
+      </div>
+    );
 
   const totalLanguages = languages.length;
-  const completedLanguages = userCourseProgress?.languages?.filter(lang =>
-    lang.isCompleted || lang.completionPercent === 100
-  )?.length || 0;
+  const completedLanguages =
+    userCourseProgress?.languages?.filter(
+      (lang) => lang.isCompleted || lang.completionPercent === 100
+    )?.length || 0;
 
   return (
-    <>
-      <div className="px-8 pb-2">
-        <Typography variant="h4" className="mb-1">Languages</Typography>
-        <Typography variant="small" className="text-gray-700">
-          {completedLanguages} of {totalLanguages} languages completed
+    <div className="bg-slate-900 min-h-screen py-6 px-4 sm:px-10">
+      <div className="mb-6">
+        <Typography variant="h4" className="text-white font-bold">
+          DSA Modules
+        </Typography>
+        <Typography variant="small" className="text-gray-300">
+          <span className="text-blue-400 font-semibold">{completedLanguages}</span> of{' '}
+          <span className="text-white font-semibold">{totalLanguages}</span> completed
         </Typography>
       </div>
 
-      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {languages.map(({ _id, name }) => {
-          const progressEntry = userCourseProgress?.languages?.find(lang =>
-            String(lang.language?._id || lang.language) === String(_id)
+      <div className="flex flex-wrap gap-6 justify-center">
+        {languages.map(({ _id, name, description }, index) => {
+          const progressEntry = userCourseProgress?.languages?.find(
+            (lang) => String(lang.language?._id || lang.language) === String(_id)
           );
-          const percent = progressEntry?.completionPercent || 0;
+          const percent = Number.isFinite(progressEntry?.completionPercent)
+            ? progressEntry.completionPercent
+            : 0;
+          const isCompleted = percent === 100;
 
           return (
-            <Card
+            <div
               key={_id}
-              className="shadow-lg cursor-pointer hover:shadow-xl transition"
+              className={`w-full sm:w-[47%] lg:w-[30%] ${index >= 3 ? 'mt-4' : ''}`}
               onClick={() => handleClick(_id)}
             >
-              <CardHeader color="blue" className="text-white text-center py-6">
-                <Typography variant="h5">{name}</Typography>
-              </CardHeader>
-              <CardBody>
-                <Typography variant="small" className="mb-2">
-                  Explore {name} DSA topics and exercises.
-                </Typography>
-                <div className="mt-2">
-                  <Progress value={percent} color={percent === 100 ? "green" : "blue"} />
-                  <Typography variant="small" className="text-right mt-1 text-gray-600">
-                    {percent}% completed
+              <Card
+                className={`bg-slate-800 rounded-2xl border-2 hover:shadow-2xl hover:scale-[1.03] transition-transform duration-200 cursor-pointer ${
+                  isCompleted ? 'border-green-400' : 'border-slate-700'
+                }`}
+              >
+                <CardHeader
+                  floated={false}
+                  shadow={false}
+                  className="flex items-center justify-center bg-blue-600 py-6 rounded-t-2xl"
+                >
+                  <Typography className="text-white text-xl font-bold">
+                    {name}
                   </Typography>
-                </div>
-              </CardBody>
-            </Card>
+                </CardHeader>
+                <CardBody className="px-5 py-4">
+                  <Typography className="text-gray-300 text-sm min-h-[48px] line-clamp-2">
+                    {description || `Explore ${name} DSA topics and exercises.`}
+                  </Typography>
+                  <div className="mt-4">
+                    <Progress
+                      value={percent}
+                      color={isCompleted ? 'green' : 'blue'}
+                      className="h-3 bg-white rounded-full"
+                    />
+                    <Typography
+                      variant="small"
+                      className={`text-right mt-1 text-xs ${
+                        isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
+                      }`}
+                    >
+                      {percent}% completed
+                    </Typography>
+                  </div>
+                </CardBody>
+              </Card>
+            </div>
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -595,7 +595,7 @@ ${notesText}
       case 'Feedback':
         return topicData?._id ? (
           <FeedbackForm
-            topicId={topic}
+            topicId={topicData?._id} // ✅ Correctly pass Mongo _id
             userId={user._id}
             fetchFeedbackData={fetchFeedbackData}
           />
@@ -668,35 +668,41 @@ ${notesText}
   };
 
   return (
-    <div className="flex flex-col md:flex-row p-6 gap-6 h-full min-h-[100vh] bg-[#141619]">
+    <div className="flex flex-col md:flex-row gap-6 p-6 bg-slate-900 min-h-screen">
       {/* Sidebar */}
-      <div className="w-full md:w-1/4 bg-[#2C2E3A] shadow-lg rounded p-4">
-        <Typography variant="h6" className="mb-4 capitalize text-[#B3B4BD]">
+      <aside className="w-full md:w-1/4 bg-[#2C2E3A] rounded-xl shadow-md p-4">
+        <Typography
+          variant="h6"
+          className="text-white mb-4 font-bold tracking-wide uppercase"
+        >
           {language ? `${language} - ${topic}` : topic}
         </Typography>
-        <List>
+        <ul className="space-y-2">
           {tabs.map((tab) => (
-            <ListItem
+            <li
               key={tab}
               onClick={() => setSelectedTab(tab)}
-              className={`cursor-pointer rounded px-3 py-2 ${selectedTab === tab
-                ? 'bg-[#0A21C0] font-semibold text-[#B3B4BD]'
-                : 'hover:bg-[#141619] text-[#B3B4BD]'
+              className={`px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 ${selectedTab === tab
+                ? 'bg-[#0A21C0] text-white font-semibold shadow-inner'
+                : 'hover:bg-[#1f2126] text-[#B3B4BD]'
                 }`}
             >
               {tab}
-            </ListItem>
+            </li>
           ))}
-        </List>
-      </div>
+        </ul>
+      </aside>
 
       {/* Main Content */}
-      <div className="w-full md:w-3/4 bg-[#2C2E3A] shadow-lg rounded p-6">
-        <Typography variant="h6" className="mb-4 text-[#0A21C0]">
+      <section className="w-full md:w-3/4 bg-[#2C2E3A] rounded-xl shadow-md p-6">
+        <Typography
+          variant="h6"
+          className="text-[#0A21C0] font-bold mb-4 tracking-wide"
+        >
           {selectedTab}
         </Typography>
         {renderContent()}
-      </div>
+      </section>
     </div>
   );
 };

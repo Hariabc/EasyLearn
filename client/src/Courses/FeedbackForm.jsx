@@ -37,12 +37,13 @@ const FeedbackForm = ({ topicId, userId }) => {
             );
 
             const payload = {
+                topic: topicId,
                 user: userId,
                 comment,
                 rating: averageRating,
             };
 
-            await axios.post(`/api/feedbacks/${topicId}`, payload);
+            await axios.post(`http://localhost:5000/api/feedbacks/${topicId}`, payload);
 
             // Reset form fields
             setRatings(Array(questions.length).fill(0));
@@ -59,13 +60,21 @@ const FeedbackForm = ({ topicId, userId }) => {
         }
     };
 
-    // Simple toast popup
+
     const showToast = (message, color) => {
         const toast = document.createElement("div");
         toast.innerText = message;
+        // Static class based on color input
+        let bgClass = "bg-blue-600"; // default
+        if (color === "green") {
+            bgClass = "bg-green-600";
+        } else if (color === "red") {
+            bgClass = "bg-red-600";
+        }
+
         toast.className = `
     fixed top-5 left-1/2 transform -translate-x-1/2
-    px-4 py-3 rounded shadow-lg text-white bg-${color}-600
+    px-4 py-3 rounded shadow-lg text-white ${bgClass}
     z-50 text-sm font-medium transition-opacity duration-300
   `;
         document.body.appendChild(toast);

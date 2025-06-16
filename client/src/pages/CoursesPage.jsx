@@ -1,5 +1,6 @@
 import React from "react";
 import CourseCard from "../components/CourseCard";
+import { useNavigate } from "react-router-dom";
 
 const sampleCourses = [
   {
@@ -25,65 +26,67 @@ const sampleCourses = [
 ];
 
 export default function CoursesPage() {
+  const navigate = useNavigate();
+
+  const handleEnroll = () => {
+    navigate("/register");
+  };
+  
   return (
-    <div className="bg-slate-900 min-h-screen">
+    <div className="bg-slate-900 min-h-screen font-sans">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6">
-              Master Your Skills
-            </h1>
-            <p className="text-xl text-purple-100 max-w-3xl mx-auto">
-              Explore our comprehensive courses designed to help you excel in your career
-            </p>
-          </div>
+      <section className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700">
+        <div className="absolute inset-0 opacity-70 bg-gradient-to-br from-black via-transparent to-black" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">
+            Master Your Skills
+          </h1>
+          <p className="mt-6 text-xl text-indigo-100 max-w-3xl mx-auto">
+            Explore our comprehensive courses designed to help you excel in your career.
+          </p>
         </div>
-      </div>
+      </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <button className="px-6 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors">
-            All Courses
-          </button>
-          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
-            Development
-          </button>
-          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
-            Programming
-          </button>
-          <button className="px-6 py-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
-            Aptitude
-          </button>
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {["All Courses", "Development", "Programming", "Aptitude"].map((cat, idx) => (
+            <button
+              key={idx}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                idx === 0
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {/* Course Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {sampleCourses.map((course, index) => (
-            <div 
-              key={index} 
-              className="group"
-            >
+            <div key={index} className="transform transition-transform hover:-translate-y-1">
               <CourseCard course={course} />
             </div>
           ))}
         </div>
+
         {/* CTA Section */}
-        <div className="mt-24 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
+        <section className="mt-24 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Ready to Start Your Learning Journey?
           </h2>
           <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who have already transformed their careers with EasyLearn
+            Join thousands of learners who’ve upgraded their careers with EasyLearn.
           </p>
-          <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium text-lg">
-            Get Started Now
+          <button onClick={handleEnroll} className="px-10 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-lg rounded-xl shadow-md hover:shadow-2xl transform hover:-translate-y-1 transition-all">
+            🚀 Get Started Now
           </button>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
