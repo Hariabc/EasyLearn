@@ -11,7 +11,7 @@ router.get('/', auth , getUser);
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/enrolled-courses', auth, getEnrolledCourses);
+router.get('/:id', auth, getEnrolledCourses);
 router.post('/enroll', auth, enrollInCourse);
 router.post('/markComplete', auth, markTopicAsCompleted);
 
