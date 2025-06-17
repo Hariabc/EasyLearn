@@ -22,6 +22,7 @@ import MyCourses from "./pages/MyCourses";
 import BadgeComponent from "./components/BadgeCard";
 import StreakDisplay from "./components/StreakDisplay";
 import CodeEditor from "./pages/CodeEditor";
+import ResetPassword from "./components/Logins/ResetPassword";
 
 function App() {
   return <>
@@ -30,6 +31,7 @@ function App() {
         <Route path="/" element={<HeroSection16 />}></Route>
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
