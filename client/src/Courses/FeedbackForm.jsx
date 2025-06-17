@@ -6,6 +6,7 @@ import {
     Card,
 } from "@material-tailwind/react";
 import axios from "axios";
+import api from "../axios.jsx"
 
 const FeedbackForm = ({ topicId, userId }) => {
     const questions = [
@@ -43,7 +44,7 @@ const FeedbackForm = ({ topicId, userId }) => {
                 rating: averageRating,
             };
 
-            await axios.post(`http://localhost:5000/api/feedbacks/${topicId}`, payload);
+            await api.post(`/api/feedbacks/${topicId}`, payload);
 
             // Reset form fields
             setRatings(Array(questions.length).fill(0));
