@@ -12,36 +12,32 @@ import {
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import QuizQuestion from "../components/QuizComponent";
 import { AuthContext } from "../context/AuthContext";
-import FeedbackForm from "../Courses/FeedbackForm"
+import FeedbackForm from "../Courses/FeedbackForm";
 import api from "../axios";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
+import { jsonrepair } from "jsonrepair";
 
-const tabs = [
-  "Notes",
-  "Watch Video",
-  "Quiz",
-  "Feedback",
-  "AI Assistance",
-];
+
+const tabs = ["Notes", "Watch Video", "Quiz", "Feedback", "AI Assistance"];
 
 const CourseDetail = () => {
   const { language, topic } = useParams();
   const [searchParams] = useSearchParams();
-  const topicId = searchParams.get('topicId');
+  const topicId = searchParams.get("topicId");
   const { user, authToken } = useContext(AuthContext);
   const [startQuizLoading, setStartQuizLoading] = useState(false);
-  const [courseId, setCourseId] = useState('');
-  const [languageId, setLanguageId] = useState('');
-  const [selectedTab, setSelectedTab] = useState('Notes');
-  const [prompt, setPrompt] = useState('');
-  const [response, setResponse] = useState('');
+  const [courseId, setCourseId] = useState("");
+  const [languageId, setLanguageId] = useState("");
+  const [selectedTab, setSelectedTab] = useState("Notes");
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiNotesLoading, setAiNotesLoading] = useState(false);
-  const [aiNotesResponse, setAiNotesResponse] = useState('');
+  const [aiNotesResponse, setAiNotesResponse] = useState("");
   const [generatedTopics, setGeneratedTopics] = useState({});
   const [dataLoading, setDataLoading] = useState(true);
   const [topicData, setTopicData] = useState(null);
-  const [languageName, setLanguageName] = useState('');
+  const [languageName, setLanguageName] = useState("");
   const [quizError, setQuizError] = useState(false);
   const [feedbackData, setFeedbackData] = useState([]);
   const [fetchError, setFetchError] = useState(null);
@@ -52,7 +48,6 @@ const CourseDetail = () => {
   const [aiQuizQuestions, setAiQuizQuestions] = useState([]);
   const [aiQuizLoading, setAiQuizLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
 
   useEffect(() => {
     const fetchTopicDetails = async () => {
@@ -117,7 +112,7 @@ const CourseDetail = () => {
   const handleAIRequest = async () => {
     if (!prompt.trim()) return;
     setAiLoading(true);
-    setResponse('');
+    setResponse("");
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -161,32 +156,42 @@ const CourseDetail = () => {
     }
 
     console.log("Generating notes for:", user._id);
-    console.log('Attempting to generate AI notes for topic:', topic, 'in language:', languageName);
+    console.log(
+      "Attempting to generate AI notes for topic:",
+      topic,
+      "in language:",
+      languageName
+    );
     setAiNotesLoading(true);
-    setAiNotesResponse('');
+    setAiNotesResponse("");
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      const referer = window.location.origin;
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      console.log("GROQ API KEY:", apiKey); // 🔍 Debug log
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "HTTP-Referer": referer,
-          "X-Title": "EduQuiz AI Notes Generator",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "mistralai/mistral-small-3.1-24b-instruct:free",
-          messages: [
-            {
-              role: "system",
-              content: "You are a professional educational assistant. Write clearly structured, high-quality notes for students. Use Markdown for headings and code blocks."
-            },
-            {
-              role: "user",
-              content: `Write well-structured educational notes for the topic: "${topic}" in Markdown format.
+      if (!apiKey) {
+        throw new Error("GROQ API Key is missing. Check your .env file.");
+      }
+
+      const res = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "llama3-8b-8192", // or llama3-70b-8192 or gemma-7b-it, etc.
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a professional educational assistant. Write clearly structured, high-quality notes for students. Use Markdown for headings and code blocks.",
+              },
+              {
+                role: "user",
+                content: `Write well-structured educational notes for the topic: "${topic}" in Markdown format.
 
 Guidelines:
 - Do NOT include the topic title at the top.
@@ -200,11 +205,12 @@ Guidelines:
 - Do NOT use numbered sections or extra formatting like italics or underlines.
 - Finish with a **CONCLUSION** summarizing the topic.
 
-Language: ${languageName}`
-            }
-          ]
-        })
-      });
+Language: ${languageName}`,
+              },
+            ],
+          }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) {
@@ -214,65 +220,59 @@ Language: ${languageName}`
       const aiText = data?.choices?.[0]?.message?.content?.trim();
       if (aiText) {
         setAiNotesResponse(aiText);
-        setGeneratedTopics(prev => ({ ...prev, [topic]: aiText }));
+        setGeneratedTopics((prev) => ({ ...prev, [topic]: aiText }));
         generateAIQuiz(aiText); // Optional quiz generation
       } else {
-        setAiNotesResponse('No AI-generated notes available.');
+        setAiNotesResponse("No AI-generated notes available.");
       }
-
     } catch (error) {
-      console.error('AI notes generation error:', error.message);
-      setAiNotesResponse('Error generating AI notes.');
+      console.error("AI notes generation error:", error.message);
+      setAiNotesResponse("Error generating AI notes.");
     } finally {
       setAiNotesLoading(false);
     }
   };
 
   useEffect(() => {
-    if (selectedTab === 'Notes' && topic && !generatedTopics[topic] && languageName) {
+    if (
+      selectedTab === "Notes" &&
+      topic &&
+      !generatedTopics[topic] &&
+      languageName
+    ) {
       generateAINotes(); // run only if not already cached and language name is available
     }
   }, [selectedTab, topic, languageName]);
 
 
-  const generateAIQuiz = async (notesText) => {
-    if (!notesText || notesText.trim().length < 10) {
-      console.warn("⚠️ No sufficient notes provided to generate quiz.");
-      setQuizError(true);
-      setAiQuizLoading(false);
-      return;
-    }
+const generateAIQuiz = async (notesText) => {
+  if (!notesText || notesText.trim().length < 10) {
+    console.warn("⚠️ No sufficient notes provided to generate quiz.");
+    setQuizError(true);
+    setAiQuizLoading(false);
+    return;
+  }
 
-    setAiQuizLoading(true);
-    setQuizError(false);
+  setAiQuizLoading(true);
+  setQuizError(false);
 
-    try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      const referer = window.location.origin;
+  try {
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3-70b-8192",
+        messages: [
+          {
+            role: "user",
+            content: `You are a strict quiz generator.
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "HTTP-Referer": referer,
-          "X-Title": "EduQuiz AI Quiz Generator",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "mistralai/mistral-small-3.1-24b-instruct:free",
-          messages: [
-            {
-              role: "user",
-              content: `You are a smart quiz generator assistant.
+Using the notes below, generate EXACTLY 5 MCQs in this strict format:
 
-Based on the following educational notes, generate exactly 5 multiple-choice questions (MCQs).
-
-Notes:
-"""
-${notesText}
-"""
-
-### Required JSON Format:
 [
   {
     "question": "What is ...?",
@@ -282,67 +282,110 @@ ${notesText}
   ...
 ]
 
-### Guidelines:
-- Each question must have 4 answer options.
-- Include the correct answer in the "correctAnswer" field.
-- Respond ONLY with a valid JavaScript array of 5 questions.
-- DO NOT include any text, comments, markdown code blocks, or explanations—just raw JSON.`
-            }
-          ]
-        })
-      });
+Guidelines:
+- Only raw JSON. No explanations or extra text.
+- Each object must contain the above 3 fields.
+- Use double quotes for all strings.
+- Exactly 4 options per question.
+- If unsure, respond with [].
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(`API error: ${data.error?.message || res.statusText}`);
-      }
+Notes:
+"""
+${notesText}
+"""`,
+          },
+        ],
+      }),
+    });
 
-      let responseText = data?.choices?.[0]?.message?.content?.trim();
-      console.log("🧪 Raw model response:", responseText);
-
-      if (!responseText) throw new Error("Empty response from model.");
-
-      if (responseText.startsWith("```")) {
-        responseText = responseText.replace(/```json|```/g, "").trim();
-      }
-
-      const parsedQuiz = JSON.parse(responseText);
-      if (!Array.isArray(parsedQuiz) || parsedQuiz.length !== 5) {
-        throw new Error("Quiz format invalid or incomplete.");
-      }
-
-      console.log("✅ Parsed quiz questions:", parsedQuiz);
-      setAiQuizQuestions(parsedQuiz);
-    } catch (err) {
-      console.error("❌ Error generating quiz:", err);
-      setAiQuizQuestions([]);
-      setQuizError(true);
-    } finally {
-      setAiQuizLoading(false);
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(`API error: ${data.error?.message || res.statusText}`);
     }
-  };
+
+    let responseText = data?.choices?.[0]?.message?.content?.trim();
+    console.log("🧪 Raw model response:", responseText);
+    if (!responseText) throw new Error("Empty response from model.");
+
+    // Remove code fences and normalize quotes/whitespace
+    responseText = responseText
+      .replace(/``````/g, "")
+      .replace(/“|”/g, '"')
+      .replace(/'([^']*)'/g, '"$1"')
+      .replace(/,\s*]/g, "]")
+      .replace(/,\s*}/g, "}")
+      .replace(/\u00A0/g, " ") // non-breaking spaces
+      .trim();
+
+    let parsedQuiz;
+    try {
+      // Try parsing directly first
+      parsedQuiz = JSON.parse(responseText);
+    } catch (err) {
+      // If direct parse fails, try repairing the JSON
+      try {
+        const repaired = jsonrepair(responseText);
+        parsedQuiz = JSON.parse(repaired);
+      } catch (repairErr) {
+        // If repair also fails, try extracting JSON array with regex
+        const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          parsedQuiz = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract valid JSON array.");
+        }
+      }
+    }
+
+    // Validate quiz structure
+    const isValidQuiz = Array.isArray(parsedQuiz) &&
+      parsedQuiz.length === 5 &&
+      parsedQuiz.every(q =>
+        typeof q.question === "string" &&
+        Array.isArray(q.options) && q.options.length === 4 &&
+        typeof q.correctAnswer === "string" &&
+        q.options.includes(q.correctAnswer)
+      );
+
+    if (!isValidQuiz) {
+      throw new Error("Quiz format invalid or incomplete.");
+    }
+
+    console.log("✅ Parsed quiz questions:", parsedQuiz);
+    setAiQuizQuestions(parsedQuiz);
+  } catch (err) {
+    console.error("❌ Error generating quiz:", err);
+    setAiQuizQuestions([]);
+    setQuizError(true);
+  } finally {
+    setAiQuizLoading(false);
+  }
+};
+
 
 
   const handleOptionChange = (questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
       ...prev,
-      [questionIndex]: selectedOption.trim().toLowerCase()
+      [questionIndex]: selectedOption.trim().toLowerCase(),
     }));
   };
-
 
   const handleSubmitQuiz = async () => {
     const questions = aiQuizQuestions || [];
     let newScore = 0;
 
     questions.forEach((q, idx) => {
-      const selected = (selectedOptions[idx] || '').toString().trim().toLowerCase();
-      let correct = (q.correctAnswer || '').toString().trim().toLowerCase();
+      const selected = (selectedOptions[idx] || "")
+        .toString()
+        .trim()
+        .toLowerCase();
+      let correct = (q.correctAnswer || "").toString().trim().toLowerCase();
 
       // If correct is a letter like "A", map it to actual option
-      if (correct.length === 1 && correct >= 'a' && correct <= 'z') {
+      if (correct.length === 1 && correct >= "a" && correct <= "z") {
         const optionIdx = correct.charCodeAt(0) - 97; // Use lowercase 'a' (97) instead of 'A' (65)
-        correct = q.options?.[optionIdx]?.trim().toLowerCase() || '';
+        correct = q.options?.[optionIdx]?.trim().toLowerCase() || "";
       }
 
       if (selected === correct) {
@@ -355,29 +398,30 @@ ${notesText}
 
     if (newScore === questions.length) {
       try {
-        const res = await api.post(`/api/users/markComplete`, {
-          courseId,
-          languageId,
-          topicId
-        }, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
+        const res = await api.post(
+          `/api/users/markComplete`,
+          {
+            courseId,
+            languageId,
+            topicId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
           }
-        });
+        );
 
         if (res.status === 200) {
           setIsTopicCompleted(true);
         } else {
-          console.error('Failed to mark topic as complete:', res.data);
+          console.error("Failed to mark topic as complete:", res.data);
         }
       } catch (err) {
-        console.error('Error marking topic as complete:', err);
+        console.error("Error marking topic as complete:", err);
       }
     }
   };
-
-
-
 
   const renderContent = () => {
     if (fetchError) {
@@ -389,20 +433,20 @@ ${notesText}
     }
 
     switch (selectedTab) {
-      case 'Notes':
+      case "Notes":
         return (
           <div>
             {aiNotesLoading ? (
-              <Typography className="text-white font-sans">Generating AI Notes...</Typography>
+              <Typography className="text-white font-sans">
+                Generating AI Notes...
+              </Typography>
             ) : (
               <div
                 className="text-white font-sans text-base leading-relaxed"
                 style={{ fontFamily: '"Segoe UI", Roboto, Arial, sans-serif' }}
               >
                 <div className="prose prose-invert text-white max-w-none">
-                  <ReactMarkdown>
-                    {aiNotesResponse}
-                  </ReactMarkdown>
+                  <ReactMarkdown>{aiNotesResponse}</ReactMarkdown>
                 </div>
               </div>
             )}
@@ -410,7 +454,7 @@ ${notesText}
             <Button
               onClick={() => {
                 // Clear previous notes for this topic and regenerate
-                setGeneratedTopics(prev => {
+                setGeneratedTopics((prev) => {
                   const updated = { ...prev };
                   delete updated[topic];
                   return updated;
@@ -425,7 +469,7 @@ ${notesText}
           </div>
         );
 
-      case 'Watch Video':
+      case "Watch Video":
         return topicData.youtubeLinks?.length > 0 ? (
           <div className="space-y-8 w-full">
             {topicData.youtubeLinks.map((link, idx) => (
@@ -439,7 +483,10 @@ ${notesText}
                   />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Typography variant="small" className="text-white font-medium">
+                  <Typography
+                    variant="small"
+                    className="text-white font-medium"
+                  >
                     Video {idx + 1}
                   </Typography>
                 </div>
@@ -461,11 +508,13 @@ ${notesText}
                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             </svg>
-            <Typography className="text-[#B3B4BD]">No videos available for this topic.</Typography>
+            <Typography className="text-[#B3B4BD]">
+              No videos available for this topic.
+            </Typography>
           </div>
         );
 
-      case 'Quiz':
+      case "Quiz":
         return (
           <div className="quiz-container text-white">
             {aiQuizQuestions.length === 0 ? (
@@ -553,7 +602,9 @@ ${notesText}
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                      onClick={() =>
+                        setCurrentQuestionIndex((prev) => prev + 1)
+                      }
                       disabled={selectedOptions[currentQuestionIndex] == null}
                       className="bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
                     >
@@ -592,7 +643,7 @@ ${notesText}
           </div>
         );
 
-      case 'Feedback':
+      case "Feedback":
         return topicData?._id ? (
           <FeedbackForm
             topicId={topicData?._id} // ✅ Correctly pass Mongo _id
@@ -603,7 +654,7 @@ ${notesText}
           <Typography>Loading feedback section...</Typography>
         );
 
-      case 'AI Assistance':
+      case "AI Assistance":
         return (
           <div className="text-white font-sans">
             <Typography className="mb-2 font-semibold text-white text-sm">
@@ -611,7 +662,7 @@ ${notesText}
             </Typography>
 
             <Card className="p-4 bg-[#1e1f22] whitespace-pre-wrap min-h-[200px] max-h-[400px] overflow-y-auto text-white text-sm rounded-md shadow-sm">
-              {response || 'AI response will appear here.'}
+              {response || "AI response will appear here."}
             </Card>
 
             <Typography className="mb-2 font-semibold text-white mt-4 text-sm">
@@ -682,10 +733,11 @@ ${notesText}
             <li
               key={tab}
               onClick={() => setSelectedTab(tab)}
-              className={`px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 ${selectedTab === tab
-                ? 'bg-[#0A21C0] text-white font-semibold shadow-inner'
-                : 'hover:bg-[#1f2126] text-[#B3B4BD]'
-                }`}
+              className={`px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 ${
+                selectedTab === tab
+                  ? "bg-[#0A21C0] text-white font-semibold shadow-inner"
+                  : "hover:bg-[#1f2126] text-[#B3B4BD]"
+              }`}
             >
               {tab}
             </li>
