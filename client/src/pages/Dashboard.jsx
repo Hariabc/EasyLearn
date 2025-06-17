@@ -420,7 +420,7 @@ const Dashboard = () => {
         </div>
 
         <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 text-white">
-          Welcome, {user.name || "User"}!
+          Welcome, {user.fullName || "User"}!
         </h1>
 
         {/* Ongoing Courses */}
