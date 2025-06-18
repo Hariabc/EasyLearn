@@ -55,11 +55,11 @@ exports.forgotPassword = async (req, res) => {
     const resetToken = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '10m' }
     );
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-    console.log("Reset URL:", resetUrl);
+    // console.log("Reset URL:", resetUrl);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -73,7 +73,7 @@ exports.forgotPassword = async (req, res) => {
       to: user.email,
       from: process.env.EMAIL_USER,
       subject: "Password Reset - EasyLearn",
-      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 15 minutes.</p>`,
+      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 10 minutes.</p>`,
     });
 
     res.status(200).json({ message: "Reset link sent to email" });
