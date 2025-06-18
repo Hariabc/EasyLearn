@@ -14,7 +14,6 @@ const SignIn = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -22,11 +21,10 @@ const SignIn = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const response = await api.post('/api/auth/login', { email, password });
       const { token } = response.data;
-      await login(token, rememberMe);
+      await login(token);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login');
@@ -40,10 +38,9 @@ const SignIn = () => {
     setError('');
     setSuccessMessage('');
     setLoading(true);
-
     try {
       await api.post('/api/auth/forgot-password', { email: forgotEmail });
-      setSuccessMessage('Password reset link sent to your email.');
+      setSuccessMessage('Link sent to your email.');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send reset link');
     } finally {
@@ -54,27 +51,26 @@ const SignIn = () => {
   return (
     <div className="min-h-screen bg-slate-800 flex items-center justify-center px-4 py-12">
       <motion.div
-        className="max-w-4xl w-full bg-white shadow-xl rounded-lg flex flex-col md:flex-row overflow-hidden"
+        className="max-w-4xl w-full bg-white shadow-xl rounded-lg flex flex-col md:flex-row overflow-hidden transition-all duration-300"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Left Image */}
-        <div className="hidden md:flex w-1/2 bg-blue-50 items-center justify-center">
-          <img src={logo} alt="Login visual" className="w-full h-full object-cover" />
+        <div className="hidden md:flex w-1/2 bg-blue-50 items-center justify-center h-[36rem]">
+          <img src={logo} alt="EasyLearn" className="w-full h-full object-cover" />
         </div>
 
-        {/* Right Form */}
-        <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center">
-          <div className="text-4xl font-bold text-blue-600 text-center mb-4">EasyLearn</div>
+        <div className="w-full md:w-1/2 py-6 px-6 sm:px-10 flex flex-col justify-center md:h-[36rem]">
+          <h1 className="text-4xl font-extrabold text-blue-600 text-center mb-2">EasyLearn</h1>
+
           <div className="text-center mb-6">
             <h2 className="text-3xl font-extrabold text-gray-900">
-              {showForgotPassword ? 'Reset Password' : 'Welcome back'}
+              {showForgotPassword ? 'Reset Password' : 'Welcome Back'}
             </h2>
             {!showForgotPassword && (
               <p className="mt-2 text-base text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-blue-600 font-medium hover:text-blue-500">
+                <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
                   Sign up
                 </Link>
               </p>
@@ -107,16 +103,7 @@ const SignIn = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center text-sm text-gray-600 space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <span>Remember me</span>
-                </label>
+              <div className="flex items-center justify-end">
                 <button
                   type="button"
                   className="text-sm text-blue-600 hover:underline"
@@ -158,7 +145,7 @@ const SignIn = () => {
                 disabled={loading}
                 className="w-full py-3 px-4 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? 'Sending...' : 'Send Link'}
               </button>
 
               <button

@@ -23,6 +23,7 @@ import BadgeComponent from "./components/BadgeCard";
 import StreakDisplay from "./components/StreakDisplay";
 import CodeEditor from "./pages/CodeEditor";
 import ResetPassword from "./components/Logins/ResetPassword";
+import Settings from "./pages/Settings";
 
 function App() {
   return <>
@@ -55,6 +56,8 @@ function App() {
             <CodeEditor />
           </ProtectedRoute>
         } />
+
+        <Route path="/settings" element={<Settings />} />
 
         <Route path="/my-badges" element={
           <ProtectedRoute>

@@ -184,7 +184,6 @@ const Dashboard = () => {
     if (isMobile) toggleMobileSidebar();
   };
 
-  const handleProfileClick = () => handleNavigationClick("/profile");
   const handleSettingsClick = () => handleNavigationClick("/settings");
   const handleLogoutClick = () => {
     if (isMobile) toggleMobileSidebar();
@@ -263,13 +262,6 @@ const Dashboard = () => {
               {isDesktopSidebarExpanded ? (
                 <>
                   <button
-                    onClick={handleProfileClick}
-                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
-                  >
-                    <UserCircleIcon className="h-5 w-5" />
-                    Profile
-                  </button>
-                  <button
                     onClick={handleSettingsClick}
                     className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
                   >
@@ -286,14 +278,6 @@ const Dashboard = () => {
                 </>
               ) : (
                 <div className="flex flex-col gap-2">
-                  <IconButton
-                    onClick={handleProfileClick}
-                    variant="text"
-                    color="blue"
-                    aria-label="Profile"
-                  >
-                    <UserCircleIcon className="h-6 w-6" />
-                  </IconButton>
                   <IconButton
                     onClick={handleSettingsClick}
                     variant="text"
@@ -371,13 +355,6 @@ const Dashboard = () => {
           {/* User Section */}
           <div className="px-2 py-4 border-t border-slate-700">
             <div className="flex gap-2 flex-col justify-between">
-              <button
-                onClick={handleProfileClick}
-                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full  text-gray-300 hover:bg-blue-50 hover:text-blue-600"
-              >
-                <UserCircleIcon className="h-5 w-5" />
-                Profile
-              </button>
               <button
                 onClick={handleSettingsClick}
                 className="flex items-center gap-1 rounded-lg px-3 py-2 w-full  text-gray-300 hover:bg-blue-50 hover:text-blue-600"
