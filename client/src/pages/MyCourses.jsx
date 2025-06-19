@@ -19,10 +19,10 @@ const MyCourses = () => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        setEnrolledCourses(response.data.enrolledCourses);
-        setTimeout(() => setLoading(false), 800);
+        setEnrolledCourses(response.data.enrolledCourses || []);
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -41,19 +41,25 @@ const MyCourses = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-900">
-        <div className="animate-spin rounded-full h-14 w-14 border-t-4 border-blue-500 border-opacity-70"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-slate-900 min-h-screen py-12 px-6 sm:px-10 lg:px-20">
       <h2 className="text-4xl font-bold text-white mb-10 text-center">My Enrolled Courses</h2>
 
-      {enrolledCourses.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {Array(6).fill(0).map((_, index) => (
+            <div
+              key={index}
+              className="h-[280px] bg-slate-800 border border-slate-700 rounded-2xl animate-pulse p-6"
+            >
+              <div className="h-5 w-3/4 bg-slate-700 rounded mb-4"></div>
+              <div className="h-4 w-1/3 bg-slate-700 rounded mb-6"></div>
+              <div className="h-[100px] w-[100px] bg-slate-700 rounded-full mx-auto mb-6"></div>
+              <div className="h-10 w-full bg-slate-700 rounded"></div>
+            </div>
+          ))}
+        </div>
+      ) : enrolledCourses.length === 0 ? (
         <p className="text-center text-slate-400">You haven’t enrolled in any courses yet.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

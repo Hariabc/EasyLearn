@@ -16,7 +16,7 @@ import FeedbackForm from "../Courses/FeedbackForm";
 import api from "../axios";
 import ReactMarkdown from "react-markdown";
 import { jsonrepair } from "jsonrepair";
-
+import GenerateYTLink from "./GenerateYTLink";
 
 const tabs = ["Notes", "Watch Video", "Quiz", "AI Assistance", "Feedback"];
 
@@ -49,7 +49,6 @@ const CourseDetail = () => {
   const [aiQuizLoading, setAiQuizLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  
 
   useEffect(() => {
     const fetchTopicDetails = async () => {
@@ -75,13 +74,13 @@ const CourseDetail = () => {
     }
   }, [topicId]);
 
- 
+
 
   const fetchFeedbackData = async () => {
     try {
       const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
       setFeedbackData(res.data);
-       
+
     } catch (err) {
       console.error("Feedback fetch error:", err);
     }
@@ -256,7 +255,6 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
       });
 
       const data = await res.json();
-    
       let responseText = data?.choices?.[0]?.message?.content?.trim();
       if (!responseText) throw new Error("Empty response from model.");
 
@@ -420,48 +418,14 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
         );
 
       case "Watch Video":
-        return topicData.youtubeLinks?.length > 0 ? (
-          <div className="space-y-8 w-full">
-            {topicData.youtubeLinks.map((link, idx) => (
-              <div key={idx} className="relative group w-full">
-                <div className="w-full h-[500px] rounded-xl overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl">
-                  <iframe
-                    src={link}
-                    title={`Video ${idx + 1}`}
-                    className="w-full h-full rounded-xl"
-                    allowFullScreen
-                  />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Typography
-                    variant="small"
-                    className="text-white font-medium"
-                  >
-                    Video {idx + 1}
-                  </Typography>
-                </div>
-              </div>
-            ))}
-          </div>
+        return topicData?._id ? (
+          <GenerateYTLink
+            topicname={topicData.title}
+            languageId={languageId}
+            languageName={languageName}
+          />
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 bg-[#141619] rounded-xl">
-            <svg
-              className="w-16 h-16 text-[#B3B4BD] mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-            <Typography className="text-[#B3B4BD]">
-              No videos available for this topic.
-            </Typography>
-          </div>
+          <Typography>Loading video section...</Typography>
         );
 
       case "Quiz":

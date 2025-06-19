@@ -12,12 +12,23 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+// exports.getUser = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     res.json(user);
+//   } catch (error) {
+//     res.status(404).json({ error: error.message });
+//   }
+// };
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user._id); // 👈 use token-based ID
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     res.json(user);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

@@ -5,7 +5,6 @@ import {
     Textarea,
     Card,
 } from "@material-tailwind/react";
-import axios from "axios";
 import api from "../axios.jsx"
 
 const FeedbackForm = ({ topicId, userId }) => {

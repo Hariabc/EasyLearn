@@ -1,9 +1,6 @@
 const express = require('express'); 
 const { getTopicsByLanguage, getTopicById } = require('../controllers/topicController.js');
 
-
-
-
 const router = express.Router();
 
 router.get('/:languageId', getTopicsByLanguage);

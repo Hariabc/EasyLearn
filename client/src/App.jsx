@@ -24,6 +24,7 @@ import StreakDisplay from "./components/StreakDisplay";
 import CodeEditor from "./pages/CodeEditor";
 import ResetPassword from "./components/Logins/ResetPassword";
 import Settings from "./pages/Settings";
+import ForumChat from "./pages/ForumChat";
 
 function App() {
   return <>
@@ -64,6 +65,15 @@ function App() {
             <BadgeComponent />
           </ProtectedRoute>
         } />
+
+        <Route
+          path="/forum"
+          element={
+            <ProtectedRoute>
+              <ForumChat />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/courses/computerlanguages" element={
           <ProtectedRoute>
