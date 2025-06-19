@@ -24,7 +24,7 @@ router.get('/me/badges', auth, async (req, res) => {
     }
 
     // Return only badges array
-    res.json({ badges: user.earnedBadges.map(b => b.badge) });
+    res.json({ badges: user.earnedBadges });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch badges', error: error.message });
   }
