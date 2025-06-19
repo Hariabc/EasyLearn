@@ -1,13 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  Typography,
-  Progress,
-} from '@material-tailwind/react';
-import { AuthContext } from '../../context/AuthContext';
-import api from '../../axios';
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, CardBody, Typography, Progress } from "@material-tailwind/react";
+import { AuthContext } from "../../context/AuthContext";
+import api from "../../axios";
 
 const FrontEndTopics = () => {
   const { languageId } = useParams();
@@ -38,22 +33,22 @@ const FrontEndTopics = () => {
 
         const course = userRes.data.enrolledCourses.find((c) =>
           c.languages?.some((lang) =>
-            typeof lang.language === 'string'
+            typeof lang.language === "string"
               ? lang.language === languageId
               : lang.language?._id === languageId
           )
         );
 
         const progress = course?.languages.find((lang) =>
-          typeof lang.language === 'string'
+          typeof lang.language === "string"
             ? lang.language === languageId
             : lang.language?._id === languageId
         );
 
         setUserProgress(progress || null);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Unable to load topics. Please try again later.');
+        console.error("Error fetching data:", err);
+        setError("Unable to load topics. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -63,8 +58,10 @@ const FrontEndTopics = () => {
   }, [user, authToken, languageId]);
 
   const handleTopicClick = (topic) => {
-    const topicSlug = topic.title.toLowerCase().replace(/\s+/g, '-');
-    navigate(`/courses/frontend/${languageId}/${topicSlug}?topicId=${topic._id}`);
+    const topicSlug = topic.title.toLowerCase().replace(/\s+/g, "-");
+    navigate(
+      `/courses/frontend/${languageId}/${topicSlug}?topicId=${topic._id}`
+    );
   };
 
   const totalTopics = topics.length;
@@ -79,11 +76,7 @@ const FrontEndTopics = () => {
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-red-400 font-medium">
-        {error}
-      </div>
-    );
+    return <div className="p-8 text-red-400 font-medium">{error}</div>;
   }
 
   return (
@@ -92,12 +85,17 @@ const FrontEndTopics = () => {
         Frontend Course Topics
       </Typography>
       <Typography variant="small" className="text-gray-300 mb-6">
-        Progress: <span className="text-blue-400 font-semibold">{completedCount}</span> / <span className="text-white font-semibold">{totalTopics}</span> topics completed
+        Progress:{" "}
+        <span className="text-blue-400 font-semibold">{completedCount}</span> /{" "}
+        <span className="text-white font-semibold">{totalTopics}</span> topics
+        completed
       </Typography>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {topics.map((topic) => {
-          const isCompleted = userProgress?.completedTopics?.includes(topic._id);
+          const isCompleted = userProgress?.completedTopics?.includes(
+            topic._id
+          );
           const percent = isCompleted ? 100 : 0;
 
           return (
@@ -114,14 +112,23 @@ const FrontEndTopics = () => {
                   Click to view details
                 </Typography>
 
-                <Progress
-                  value={percent}
-                  color={percent === 100 ? 'green' : 'blue'}
-                  className="h-3 bg-white"
-                />
+                {/* ✅ Custom Progress Bar */}
+                <div className="w-full bg-white h-3 rounded">
+                  <div
+                    className={`h-3 rounded transition-all duration-300 ${
+                      percent === 100 ? "bg-blue-600" : "bg-blue-500"
+                    }`}
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+
                 <Typography
                   variant="small"
-                  className={`text-right mt-1 ${isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'}`}
+                  className={`text-right mt-1 ${
+                    isCompleted
+                      ? "text-blue-100 font-semibold"
+                      : "text-gray-400"
+                  }`}
                 >
                   {percent}% completed
                 </Typography>

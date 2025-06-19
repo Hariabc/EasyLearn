@@ -109,27 +109,50 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-
+// Update user profile (fullName, email)
 exports.updateProfile = async (req, res) => {
-  const { fullname, email } = req.body;
+  const { fullName, email } = req.body;
+
+  // Basic input validation
+  if (!fullName && !email) {
+    return res.status(400).json({ message: 'Please provide fullName or email to update.' });
+  }
 
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.fullname = fullname || user.fullname;
-    user.email = email || user.email;
+    if (fullName) user.fullName = fullName;
+    if (email) {
+      // Check if email is already taken by another user
+      const existing = await User.findOne({ email });
+      if (existing && existing._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ message: 'Email already in use by another account.' });
+      }
+      user.email = email;
+    }
 
     await user.save();
-
     res.json({ message: 'Profile updated successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+// Change user password
 exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  // Basic input validation
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ message: 'All password fields are required.' });
+  }
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: 'New password and confirm password do not match.' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+  }
 
   try {
     const user = await User.findById(req.user._id);

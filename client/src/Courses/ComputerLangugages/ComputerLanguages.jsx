@@ -105,7 +105,7 @@ const ComputerLanguages = () => {
                   </Typography>
                   <div className="mt-4">
                     <Progress
-                      value={percent}
+                      value={Math.round(percent)}
                       color={isCompleted ? 'green' : 'blue'}
                       className="h-3 bg-white rounded-full"
                     />
@@ -115,7 +115,7 @@ const ComputerLanguages = () => {
                         isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
                       }`}
                     >
-                      {percent}% completed
+                      {Math.round(percent)}% completed
                     </Typography>
                   </div>
                 </CardBody>

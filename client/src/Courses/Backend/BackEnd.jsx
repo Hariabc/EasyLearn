@@ -132,7 +132,7 @@ const Backend = () => {
                   </Typography>
                   <div className="mt-4">
                     <Progress
-                      value={percent}
+                      value={Math.round(percent)}
                       color={isCompleted ? 'green' : 'blue'}
                       className="h-3 bg-white rounded-full"
                     />
@@ -141,7 +141,7 @@ const Backend = () => {
                       className={`text-right mt-1 text-xs ${isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
                         }`}
                     >
-                      {percent}% completed
+                      {Math.round(percent)}% completed
                     </Typography>
                   </div>
                 </CardBody>

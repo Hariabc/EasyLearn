@@ -200,84 +200,86 @@ const Dashboard = () => {
     <div className="flex h-screen bg-slate-800">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col ${isDesktopSidebarExpanded ? "w-64" : "w-20"
+        className={`hidden lg:flex flex-col ${isDesktopSidebarExpanded ? "w-64" : "w-18"
           } bg-slate-900 shadow-lg transition-all duration-300 ease-in-out flex-shrink-0`}
       >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div
-            className={`flex items-center ${isDesktopSidebarExpanded
-              ? "justify-between px-6"
-              : "justify-center px-2"
-              } py-5 border-b border-slate-700`}
-          >
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            {/* Header */}
             <div
-              className={`flex items-center ${isDesktopSidebarExpanded ? "gap-3" : ""
-                }`}
+              className={`flex items-center ${isDesktopSidebarExpanded
+                ? "justify-between px-6"
+                : "justify-center px-2"
+                } py-5 border-b border-slate-700`}
             >
-              {isDesktopSidebarExpanded && (
-                <span className="text-xl font-semibold tracking-tight text-white">
-                  EasyLearn
-                </span>
-              )}
-            </div>
-            <button
-              onClick={toggleDesktopSidebar}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none ${!isDesktopSidebarExpanded ? "lg:mx-auto" : ""
-                }`}
-              aria-label="Toggle desktop sidebar"
-            >
-              {isDesktopSidebarExpanded ? (
-                <ChevronLeftIcon className="h-6 w-6 text-gray-300" />
-              ) : (
-                <ChevronRightIcon className="h-6 w-6 text-gray-300" />
-              )}
-            </button>
-          </div>
-          {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {navItems.map((item, index) => (
-              <a
-                key={index}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavigationClick(item.path);
-                }}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${!isDesktopSidebarExpanded ? "justify-center" : ""
+              <div
+                className={`flex items-center ${isDesktopSidebarExpanded ? "gap-3" : ""
                   }`}
               >
-                <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
-                  {item.icon}
-                </span>
                 {isDesktopSidebarExpanded && (
-                  <span className="truncate">{item.text}</span>
+                  <span className="text-xl font-semibold tracking-tight text-white">
+                    EasyLearn
+                  </span>
                 )}
-              </a>
-            ))}
-          </nav>
+              </div>
+              <button
+                onClick={toggleDesktopSidebar}
+                className={`p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none ${!isDesktopSidebarExpanded ? "lg:mx-auto" : ""
+                  }`}
+                aria-label="Toggle desktop sidebar"
+              >
+                {isDesktopSidebarExpanded ? (
+                  <ChevronLeftIcon className="h-6 w-6 text-gray-300" />
+                ) : (
+                  <ChevronRightIcon className="h-6 w-6 text-gray-300" />
+                )}
+              </button>
+            </div>
+            {/* Navigation */}
+            <nav className="px-2 py-4 space-y-1 overflow-y-auto">
+              {navItems.map((item, index) => (
+                <a
+                  key={index}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavigationClick(item.path);
+                  }}
+                  className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium transition hover:bg-blue-50 hover:text-blue-600 ${!isDesktopSidebarExpanded ? "justify-center" : ""
+                    }`}
+                >
+                  <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
+                    {item.icon}
+                  </span>
+                  {isDesktopSidebarExpanded && (
+                    <span className="truncate">{item.text}</span>
+                  )}
+                </a>
+              ))}
+            </nav>
+          </div>
           {/* User Section */}
           <div className="py-4 border-t border-slate-700">
-            <div className="flex gap-2 flex-col">
+            <div className="flex gap-2 flex-col px-2 py-4">
               {isDesktopSidebarExpanded ? (
                 <>
                   <button
                     onClick={handleSettingsClick}
-                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
                   >
                     <Cog6ToothIcon className="h-5 w-5" />
-                    Settings
+                    <span className="leading-none">Settings</span>
                   </button>
                   <button
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
                   >
                     <PowerIcon className="h-5 w-5" />
-                    Logout
+                    <span className="leading-none">Logout</span>
                   </button>
                 </>
               ) : (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 items-center">
                   <IconButton
                     onClick={handleSettingsClick}
                     variant="text"
@@ -316,58 +318,59 @@ const Dashboard = () => {
           }`}
         aria-label="Mobile Sidebar"
       >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="EasyLearn Logo" className="h-8" />
-              <span className="text-xl font-semibold tracking-tight text-white">
-                EasyLearn
-              </span>
-            </div>
-            <button
-              onClick={toggleMobileSidebar}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
-              aria-label="Close mobile sidebar"
-            >
-              <XMarkIcon className="h-6 w-6 text-gray-300" />
-            </button>
-          </div>
-          {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {navItems.map((item, index) => (
-              <a
-                key={index}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavigationClick(item.path);
-                }}
-                className="group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium hover:bg-blue-50 hover:text-blue-600"
-              >
-                <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
-                  {item.icon}
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-semibold tracking-tight text-white">
+                  EasyLearn
                 </span>
-                <span>{item.text}</span>
-              </a>
-            ))}
-          </nav>
+              </div>
+              <button
+                onClick={toggleMobileSidebar}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
+                aria-label="Close mobile sidebar"
+              >
+                <XMarkIcon className="h-6 w-6 text-gray-300" />
+              </button>
+            </div>
+            {/* Navigation */}
+            <nav className="px-2 py-4 space-y-1 overflow-y-auto">
+              {navItems.map((item, index) => (
+                <a
+                  key={index}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavigationClick(item.path);
+                  }}
+                  className="group flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 font-medium hover:bg-blue-50 hover:text-blue-600"
+                >
+                  <span className="flex-shrink-0 text-gray-300 group-hover:text-blue-500">
+                    {item.icon}
+                  </span>
+                  <span>{item.text}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
           {/* User Section */}
           <div className="px-2 py-4 border-t border-slate-700">
-            <div className="flex gap-2 flex-col justify-between">
+            <div className="flex gap-2 flex-col items-center">
               <button
                 onClick={handleSettingsClick}
-                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full  text-gray-300 hover:bg-blue-50 hover:text-blue-600"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 w-full text-gray-300 hover:bg-blue-50 hover:text-blue-600"
               >
                 <Cog6ToothIcon className="h-5 w-5" />
-                Settings
+                <span className="leading-none">Settings</span>
               </button>
               <button
                 onClick={handleLogoutClick}
-                className="flex items-center gap-1 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 w-full text-red-600 hover:bg-red-50"
               >
                 <PowerIcon className="h-5 w-5" />
-                Logout
+                <span className="leading-none">Logout</span>
               </button>
             </div>
           </div>
@@ -389,7 +392,6 @@ const Dashboard = () => {
             <Bars3Icon className="h-6 w-6 text-gray-300" />
           </button>
           <div className="flex  gap-2">
-            <img src={logo} alt="EasyLearn Logo" className="h-8" />
             <span className="text-xl font-semibold tracking-tight text-white">
               EasyLearn
             </span>
@@ -476,7 +478,7 @@ const Dashboard = () => {
                         />
                       </div>
                       {/* Percentage text */}
-                      <span className="text-sm font-semibold text-blue-700 min-w-[36px] text-right">
+                      <span className="text-sm font-semibold text-blue-100 min-w-[36px] text-right">
                         {Math.round(course.completionPercent || 0)}%
                       </span>
                     </div>

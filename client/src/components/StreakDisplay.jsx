@@ -47,13 +47,13 @@ const StreakDisplay = () => {
     };
 
     return (
-        <Card className="p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
+        <Card className="p-4 bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-lg">
             <div className="flex items-center justify-between">
                 <Typography variant="h5" className="font-bold">
                     🔥 Streak: {streak} days
                 </Typography>
                 <div className={`transition-transform duration-500 ${isAnimating ? 'scale-110' : 'scale-100'}`}>
-                    {streak > 0 && '🔥'}
+                    {streak > 0 }
                 </div>
             </div>
         </Card>

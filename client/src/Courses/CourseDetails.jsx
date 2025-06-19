@@ -52,50 +52,23 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchTopicDetails = async () => {
       try {
-        // console.log('Fetching topic details for topicId:', topicId);
         const res = await api.get(`/api/topics/topicById/${topicId}`);
         const data = res.data;
         setTopicData(data);
         setCourseId(data.course);
         setLanguageId(data.language);
-        // console.log('Topic data fetched, languageId:', data.language);
 
-        // Fetch language name
         const langRes = await api.get(`/api/languages/byId/${data.language}`);
         setLanguageName(langRes.data.name);
-        // console.log('Language name fetched:', langRes.data.name);
       } catch (err) {
-        // console.error('Error fetching topic or language details:', err);
         setFetchError(err.message);
       } finally {
         setDataLoading(false);
       }
     };
 
-    // const fetchQuizData = async () => {
-    //   try {
-    //     const res = await fetch(`http://localhost:5000/api/quizzes/${topicId}`);
-    //     if (res.ok) {
-    //       const data = await res.json();
-    //       setQuizData(data);
-    //     }
-    //   } catch (err) {
-    //     console.error('Quiz fetch error:', err);
-    //   }
-    // };
-
-    // const fetchFeedbackData = async () => {
-    //   try {
-    //     const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
-    //     setFeedbackData(res.data);
-    //   } catch (err) {
-    //     console.error("Feedback fetch error:", err);
-    //   }
-    // };
-
     if (topicId) {
       fetchTopicDetails();
-      // fetchQuizData();
       fetchFeedbackData();
     }
   }, [topicId]);
@@ -160,8 +133,6 @@ const CourseDetail = () => {
       setAiNotesResponse(generatedTopics[topic]);
       return;
     }
-    // console.log("Generating notes for:", user._id);
-    // console.log("Attempting to generate AI notes for:", topic, "in", languageName);
     setAiNotesLoading(true);
     setAiNotesResponse("");
 
@@ -191,7 +162,7 @@ const CourseDetail = () => {
               content: `You are a professional ${languageName} teacher.
 
 Write comprehensive, structured, and easy-to-understand educational notes on the topic: "${topic}" from ${languageName}.
-Explain about ${topic} from ${languageName} in Detail in 3000 words or more.
+Explain about ${topic} from ${languageName} in Detail in 800 words or more.
 Guidelines:
 - Use **Markdown** formatting (not HTML).
 - Start directly with the content. Do not include a main title.
@@ -242,7 +213,7 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
     }
   }, [selectedTab, topic, languageName]);
 
-  const generateAIQuiz = async (notesText) => {
+  const generateAIQuiz = async (notesText, retryCount = 0) => {
     if (!notesText || notesText.trim().length < 10) {
       console.warn("⚠️ No sufficient notes provided to generate quiz.");
       setQuizError(true);
@@ -255,6 +226,13 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
 
     try {
       const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) {
+        setQuizError(true);
+        setAiQuizLoading(false);
+        alert("GROQ API Key missing.");
+        return;
+      }
+
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -266,44 +244,20 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
           messages: [
             {
               role: "user",
-              content: `You are a strict quiz generator.
-
-Based on the following study material, generate EXACTLY 5 MCQs in this valid JSON format:
-
-[
-  {
-    "question": "What is ...?",
-    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-    "correctAnswer": "Option 2"
-  },
-  ...
-]
-
-Important rules:
-- Only return pure JSON. No explanation or commentary.
-- All field names and string values must use double quotes.
-- Do not include markdown or \`\`\`json wrappers.
-- If content is not enough, just return []
-
-Study material: ${notesText}`,
-
+              content: `You are a strict quiz generator.\n\nBased on the following study material, generate EXACTLY 5 MCQs in this valid JSON format:\n\n[\n  {\n    \"question\": \"What is ...?\",\n    \"options\": [\"Option 1\", \"Option 2\", \"Option 3\", \"Option 4\"],\n    \"correctAnswer\": \"Option 2\"\n  },\n  ...\n]\n\nImportant rules:\n- Only return pure JSON. No explanation or commentary.\n- All field names and string values must use double quotes.\n- Do not include markdown or \`\`\`json wrappers.\n- If content is not enough, just return []\n\nStudy material: ${notesText}`,
             },
           ],
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(`API error: ${data.error?.message || res.statusText}`);
-      }
-
+    
       let responseText = data?.choices?.[0]?.message?.content?.trim();
-      console.log("🧪 Raw model response:", responseText);
       if (!responseText) throw new Error("Empty response from model.");
 
       responseText = responseText
         .replace(/```(json)?/g, "")
-        .replace(/“|”/g, '"')
+        .replace(/""|""/g, '"')
         .replace(/'([^']*)'/g, '"$1"')
         .replace(/,\s*]/g, "]")
         .replace(/,\s*}/g, "}")
@@ -329,7 +283,8 @@ Study material: ${notesText}`,
 
       const isValidQuiz =
         Array.isArray(parsedQuiz) &&
-        parsedQuiz.length === 5 &&
+        parsedQuiz.length >= 3 &&
+        parsedQuiz.length <= 5 &&
         parsedQuiz.every(
           (q) =>
             typeof q.question === "string" &&
@@ -344,7 +299,6 @@ Study material: ${notesText}`,
       }
 
       // ✅ Save to state and to localStorage
-      console.log("✅ Parsed quiz questions:", parsedQuiz);
       setAiQuizQuestions(parsedQuiz);
       localStorage.setItem("aiQuizQuestions", JSON.stringify(parsedQuiz));
 
@@ -407,6 +361,20 @@ Study material: ${notesText}`,
 
         if (res.status === 200) {
           setIsTopicCompleted(true);
+          // Update streak when quiz is completed
+          try {
+            await api.post(
+              '/api/streaks/update',
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${authToken}`,
+                },
+              }
+            );
+          } catch (streakErr) {
+            console.error('Failed to update streak:', streakErr);
+          }
         } else {
           console.error("Failed to mark topic as complete:", res.data);
         }
@@ -510,7 +478,7 @@ Study material: ${notesText}`,
                         const parsed = JSON.parse(cachedQuiz);
                         setAiQuizQuestions(parsed);
                       } else {
-                        await generateAIQuiz(notesText); // You must pass notesText
+                        await generateAIQuiz(aiNotesResponse);
                       }
 
                       if (
@@ -702,6 +670,20 @@ Study material: ${notesText}`,
         return <Typography>Select a tab to view its content.</Typography>;
     }
   };
+
+  useEffect(() => {
+    if (
+      selectedTab === "Quiz" &&
+      aiNotesResponse &&
+      !aiQuizLoading &&
+      aiQuizQuestions.length === 0 &&
+      !quizError
+    ) {
+      setTimeout(() => {
+        generateAIQuiz(aiNotesResponse);
+      }, 1000); // 1 second delay before generating quiz
+    }
+  }, [selectedTab, aiNotesResponse]);
 
   return (
     <div className="flex flex-col md:flex-row gap-6 p-6 bg-slate-900 min-h-screen">

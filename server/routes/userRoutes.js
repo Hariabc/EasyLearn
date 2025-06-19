@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { register, login} = require('../controllers/authController.js');
+const { register, login, updateProfile, changePassword } = require('../controllers/authController.js');
 const auth = require('../middleware/auth');
 
 const { enrollInCourse , getEnrolledCourses, markTopicAsCompleted , getUser} = require('../controllers/userControllers.js');
@@ -68,5 +68,10 @@ router.post("/test/complete-frontend-course/:userId", async (req, res) => {
   }
 });
 
+// Update user profile
+router.patch('/me/profile', auth, updateProfile);
+
+// Change user password
+router.post('/me/change-password', auth, changePassword);
 
 module.exports = router;

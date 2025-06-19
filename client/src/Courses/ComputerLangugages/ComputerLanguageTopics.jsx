@@ -109,16 +109,19 @@ const LanguageTopics = () => {
                   Click to view details
                 </Typography>
 
-                <Progress
-                  value={percent}
-                  color={percent === 100 ? 'green' : 'blue'}
-                  className="h-3 bg-white"
-                />
+                {/* ✅ Custom Progress Bar */}
+                <div className="w-full bg-white h-3 rounded-full">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-300 ${percent === 100 ? "bg-blue-600" : "bg-blue-500"}`}
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+
                 <Typography
                   variant="small"
-                  className={`text-right mt-1 ${isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'}`}
+                  className={`text-right mt-1 ${isCompleted ? 'text-blue-100 font-semibold' : 'text-gray-400'}`}
                 >
-                  {percent}% completed
+                  {Math.round(percent)}% completed
                 </Typography>
               </CardBody>
             </Card>

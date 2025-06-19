@@ -22,8 +22,8 @@ const Settings = () => {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.put(
-        '/api/users/update-profile',
+      const res = await api.patch(
+        '/api/users/me/profile',
         { fullName: name, email },
         {
           headers: { Authorization: `Bearer ${authToken}` },
@@ -45,9 +45,9 @@ const Settings = () => {
     }
 
     try {
-      const res = await api.put(
-        '/api/users/change-password',
-        { currentPassword, newPassword },
+      const res = await api.post(
+        '/api/users/me/change-password',
+        { currentPassword, newPassword, confirmPassword: confirmNewPassword },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
