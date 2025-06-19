@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import api from "../axios";
 import { AuthContext } from "../context/AuthContext";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://easylearn-1-bt4h.onrender.com");
 
 const ForumChat = () => {
   const { authToken } = useContext(AuthContext);
