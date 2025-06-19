@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardBody, Typography, Progress } from '@material-tailwind/react';
+import { Card, CardBody, Typography } from '@material-tailwind/react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../axios';
 
@@ -65,22 +65,6 @@ const DSATopics = () => {
   const totalTopics = topics.length;
   const completedCount = userProgress?.completedTopics?.length || 0;
 
-  if (loading) {
-    return (
-      <div className="p-8 text-blue-400 font-medium animate-pulse">
-        Loading topics...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 text-red-400 font-medium">
-        {error}
-      </div>
-    );
-  }
-
   return (
     <div className="bg-slate-900 min-h-screen p-8">
       <Typography variant="h4" className="text-white font-bold mb-1">
@@ -90,44 +74,64 @@ const DSATopics = () => {
         Progress: <span className="text-blue-400 font-semibold">{completedCount}</span> / <span className="text-white font-semibold">{totalTopics}</span> topics completed
       </Typography>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {topics.map((topic) => {
-          const isCompleted = userProgress?.completedTopics?.includes(topic._id);
-          const percent = isCompleted ? 100 : 0;
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-slate-800 p-4 rounded border border-slate-700">
+                <div className="h-6 bg-slate-600 rounded w-3/4 mb-3"></div>
+                <div className="h-4 bg-slate-700 rounded w-full mb-4"></div>
+                <div className="h-3 bg-slate-600 rounded-full w-full"></div>
+                <div className="h-4 bg-slate-700 w-1/3 rounded mt-2 ml-auto"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-8 text-red-400 font-medium">{error}</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {topics.map((topic) => {
+            const isCompleted = userProgress?.completedTopics?.includes(topic._id);
+            const percent = isCompleted ? 100 : 0;
 
-          return (
-            <Card
-              key={topic._id}
-              className="cursor-pointer hover:shadow-xl transition border border-slate-700 bg-slate-800"
-              onClick={() => handleTopicClick(topic)}
-            >
-              <CardBody>
-                <Typography variant="h6" className="text-white mb-1">
-                  {topic.title}
-                </Typography>
-                <Typography variant="small" className="text-gray-400 mb-2">
-                  Click to view details
-                </Typography>
+            return (
+              <Card
+                key={topic._id}
+                className="cursor-pointer hover:shadow-xl transition border border-slate-700 bg-slate-800"
+                onClick={() => handleTopicClick(topic)}
+              >
+                <CardBody>
+                  <Typography variant="h6" className="text-white mb-1">
+                    {topic.title}
+                  </Typography>
+                  <Typography variant="small" className="text-gray-400 mb-2">
+                    Click to view details
+                  </Typography>
 
-                {/* ✅ Custom Progress Bar */}
-                <div className="w-full bg-white h-3 rounded-full">
-                  <div
-                    className={`h-3 rounded-full transition-all duration-300 ${percent === 100 ? "bg-blue-600" : "bg-blue-500"}`}
-                    style={{ width: `${percent}%` }}
-                  />
-                </div>
+                  <div className="w-full bg-white h-3 rounded-full">
+                    <div
+                      className={`h-3 rounded-full transition-all duration-300 ${
+                        percent === 100 ? 'bg-blue-600' : 'bg-blue-500'
+                      }`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
 
-                <Typography
-                  variant="small"
-                  className={`text-right mt-1 ${isCompleted ? 'text-blue-100 font-semibold' : 'text-gray-400'}`}
-                >
-                  {Math.round(percent)}% completed
-                </Typography>
-              </CardBody>
-            </Card>
-          );
-        })}
-      </div>
+                  <Typography
+                    variant="small"
+                    className={`text-right mt-1 ${
+                      isCompleted ? 'text-blue-100 font-semibold' : 'text-gray-400'
+                    }`}
+                  >
+                    {Math.round(percent)}% completed
+                  </Typography>
+                </CardBody>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ const Settings = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const { user, authToken } = useContext(AuthContext);
 
@@ -16,6 +17,7 @@ const Settings = () => {
     if (user) {
       setName(user.fullName || '');
       setEmail(user.email || '');
+      setLoading(false);
     }
   }, [user]);
 
@@ -42,7 +44,6 @@ const Settings = () => {
       toast.remove();
     }, 1000);
   };
-
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -96,7 +97,13 @@ const Settings = () => {
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
           <h3 className="text-2xl font-semibold text-white mb-6 border-b border-slate-600 pb-2">Profile Information</h3>
 
-          {!isEditing ? (
+          {loading ? (
+            <div className="space-y-4 animate-pulse">
+              <div className="h-4 w-1/3 bg-slate-600 rounded"></div>
+              <div className="h-4 w-2/3 bg-slate-700 rounded"></div>
+              <div className="h-10 w-full bg-slate-700 rounded-lg mt-4"></div>
+            </div>
+          ) : !isEditing ? (
             <div className="text-slate-300 space-y-4">
               <p><strong>Full Name:</strong> {name}</p>
               <p><strong>Email:</strong> {email}</p>
@@ -151,44 +158,57 @@ const Settings = () => {
         {/* Password Section */}
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
           <h3 className="text-2xl font-semibold text-white mb-6 border-b border-slate-600 pb-2">Change Password</h3>
-          <form onSubmit={handlePasswordUpdate} className="space-y-4">
-            <div>
-              <label className="block text-slate-400 mb-1">Current Password</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+
+          {loading ? (
+            <div className="space-y-4 animate-pulse">
+              <div className="h-4 w-1/4 bg-slate-600 rounded"></div>
+              <div className="h-10 w-full bg-slate-700 rounded-lg"></div>
+              <div className="h-4 w-1/4 bg-slate-600 rounded mt-4"></div>
+              <div className="h-10 w-full bg-slate-700 rounded-lg"></div>
+              <div className="h-4 w-1/4 bg-slate-600 rounded mt-4"></div>
+              <div className="h-10 w-full bg-slate-700 rounded-lg"></div>
+              <div className="h-10 w-full bg-slate-600 rounded-xl mt-4"></div>
             </div>
-            <div>
-              <label className="block text-slate-400 mb-1">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-slate-400 mb-1">Confirm New Password</label>
-              <input
-                type="password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
-            >
-              Update Password
-            </button>
-          </form>
+          ) : (
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div>
+                <label className="block text-slate-400 mb-1">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Confirm New Password</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
+              >
+                Update Password
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

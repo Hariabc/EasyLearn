@@ -66,12 +66,6 @@ const Frontend = () => {
   };
 
   if (!user) return <div>Loading user data...</div>;
-  if (loading)
-    return (
-      <div className="p-8 text-center text-blue-400 font-semibold animate-pulse">
-        Loading frontend languages...
-      </div>
-    );
   if (error)
     return (
       <div className="p-8 text-center text-red-400 font-semibold">
@@ -97,64 +91,79 @@ const Frontend = () => {
         </Typography>
       </div>
 
-      <div className="flex flex-wrap gap-6 justify-center">
-        {languages.map(({ _id, name, description }, index) => {
-          const progressEntry = userCourseProgress?.languages?.find(
-            (lang) => String(lang.language?._id || lang.language) === String(_id)
-          );
-          const percent = Number.isFinite(progressEntry?.completionPercent)
-            ? progressEntry.completionPercent
-            : 0;
-          const isCompleted = percent === 100;
-
-          return (
-            <div
-              key={_id}
-              className={`w-full sm:w-[47%] lg:w-[30%] ${index >= 3 ? 'mt-4' : ''}`}
-              onClick={() => handleClick(_id)}
-            >
-              <Card
-                className={`bg-slate-800 rounded-2xl border-2 hover:shadow-2xl hover:scale-[1.03] transition-transform duration-200 cursor-pointer ${
-                  isCompleted ? 'border-green-400' : 'border-slate-700'
-                }`}
-              >
-                <CardHeader
-                  floated={false}
-                  shadow={false}
-                  className="flex items-center justify-center bg-blue-600 py-6 rounded-t-2xl"
-                >
-                  <Typography className="text-white text-xl font-bold">
-                    {name}
-                  </Typography>
-                </CardHeader>
-                <CardBody className="px-5 py-4">
-                  <Typography className="text-gray-300 text-sm min-h-[48px] line-clamp-2">
-                    {description || `Explore ${name} tutorials and resources.`}
-                  </Typography>
-                  <div className="mt-4">
-                    <Progress
-                      value={Math.round(percent)}
-                      color={isCompleted ? 'green' : 'blue'}
-                      className="h-3 bg-white rounded-full"
-                    />
-                    <Typography
-                      variant="small"
-                      className={`text-right mt-1 text-xs ${
-                        isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
-                      }`}
-                    >
-                      {Math.round(percent)}% completed
-                    </Typography>
-                  </div>
-                </CardBody>
-              </Card>
+      {/* ✅ Skeleton while loading */}
+      {loading ? (
+        <div className="flex flex-wrap gap-6 justify-center">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="w-full sm:w-[47%] lg:w-[30%] animate-pulse">
+              <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4">
+                <div className="h-6 w-1/2 bg-slate-600 rounded mb-4 mx-auto" />
+                <div className="h-4 bg-slate-700 rounded w-full mb-2" />
+                <div className="h-4 bg-slate-700 rounded w-5/6 mb-4" />
+                <div className="h-3 bg-slate-600 rounded-full w-full" />
+              </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-6 justify-center">
+          {languages.map(({ _id, name, description }, index) => {
+            const progressEntry = userCourseProgress?.languages?.find(
+              (lang) => String(lang.language?._id || lang.language) === String(_id)
+            );
+            const percent = Number.isFinite(progressEntry?.completionPercent)
+              ? progressEntry.completionPercent
+              : 0;
+            const isCompleted = percent === 100;
+
+            return (
+              <div
+                key={_id}
+                className={`w-full sm:w-[47%] lg:w-[30%] ${index >= 3 ? 'mt-4' : ''}`}
+                onClick={() => handleClick(_id)}
+              >
+                <Card
+                  className={`bg-slate-800 rounded-2xl border-2 hover:shadow-2xl hover:scale-[1.03] transition-transform duration-200 cursor-pointer ${
+                    isCompleted ? 'border-green-400' : 'border-slate-700'
+                  }`}
+                >
+                  <CardHeader
+                    floated={false}
+                    shadow={false}
+                    className="flex items-center justify-center bg-blue-600 py-6 rounded-t-2xl"
+                  >
+                    <Typography className="text-white text-xl font-bold">
+                      {name}
+                    </Typography>
+                  </CardHeader>
+                  <CardBody className="px-5 py-4">
+                    <Typography className="text-gray-300 text-sm min-h-[48px] line-clamp-2">
+                      {description || `Explore ${name} tutorials and resources.`}
+                    </Typography>
+                    <div className="mt-4">
+                      <Progress
+                        value={Math.round(percent)}
+                        color={isCompleted ? 'green' : 'blue'}
+                        className="h-3 bg-white rounded-full"
+                      />
+                      <Typography
+                        variant="small"
+                        className={`text-right mt-1 text-xs ${
+                          isCompleted ? 'text-green-400 font-semibold' : 'text-gray-400'
+                        }`}
+                      >
+                        {Math.round(percent)}% completed
+                      </Typography>
+                    </div>
+                  </CardBody>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
 export default Frontend;
-
