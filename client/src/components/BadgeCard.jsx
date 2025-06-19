@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
 import api from "../axios";
+import badgeimg from '../assets/Badges/html.png';
+
 
 const BadgeCard = ({ badge, awardedAt }) => {
   const formattedDate = awardedAt ? new Date(awardedAt).toLocaleDateString() : "Unknown";

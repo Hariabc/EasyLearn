@@ -1,0 +1,16 @@
+.glow {
+  animation: simpleGlow 1.5s ease-in-out infinite;
+  background-color: #334155; /* fallback bg */
+}
+
+@keyframes simpleGlow {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
