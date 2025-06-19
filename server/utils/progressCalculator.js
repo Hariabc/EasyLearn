@@ -4,56 +4,50 @@ const Badge = require('../models/Badge');
 async function calculateUserProgress(user) {
   const newlyEarnedBadges = [];
 
-  // Collect all language IDs from enrolled courses
+  // Step 1: Collect all unique language IDs from user's enrolledCourses
   const languageIdsSet = new Set();
-  user.enrolledCourses.forEach(courseData => {
-    courseData.languages.forEach(langData => {
-      const langId = langData.language._id ? langData.language._id.toString() : langData.language.toString();
+  user.enrolledCourses.forEach(course => {
+    course.languages.forEach(lang => {
+      const langId = (lang.language?._id || lang.language).toString();
       languageIdsSet.add(langId);
     });
   });
   const languageIds = Array.from(languageIdsSet);
 
-  // Fetch all topics for these languages at once
+  // Step 2: Fetch all topics grouped by language
   const topics = await Topic.find({ language: { $in: languageIds } }, '_id language');
-
-  // Group topics by language ID for quick lookup
   const topicsByLanguage = {};
   for (const topic of topics) {
     const langId = topic.language.toString();
-    if (!topicsByLanguage[langId]) {
-      topicsByLanguage[langId] = [];
-    }
+    if (!topicsByLanguage[langId]) topicsByLanguage[langId] = [];
     topicsByLanguage[langId].push(topic._id.toString());
   }
 
-  // Now calculate progress for each course and language without extra DB calls
-  for (const courseData of user.enrolledCourses) {
+  // Step 3: Loop through enrolled courses and update progress
+  for (const course of user.enrolledCourses) {
     let totalCourseTopics = 0;
     let totalCompletedCourseTopics = 0;
 
-    for (const langData of courseData.languages) {
-      const languageId = langData.language._id ? langData.language._id.toString() : langData.language.toString();
-      const completedTopicIds = langData.completedTopics.map(id => id.toString());
+    for (const lang of course.languages) {
+      const langId = (lang.language?._id || lang.language).toString();
+      const completedTopicIds = lang.completedTopics.map(id => id.toString());
+      const totalTopics = (topicsByLanguage[langId] || []).length;
 
-      const topicIds = topicsByLanguage[languageId] || [];
-      const totalTopics = topicIds.length;
+      const validCompletedCount = (topicsByLanguage[langId] || []).filter(id => completedTopicIds.includes(id)).length;
 
-      // Count valid completed topics (only those that exist in the topic list)
-      const validCompletedCount = topicIds.filter(id => completedTopicIds.includes(id)).length;
+      // Step 3a: Update language progress
+      lang.completionPercent = totalTopics === 0 ? 0 : Math.round((validCompletedCount / totalTopics) * 100);
+      lang.isCompleted = totalTopics > 0 && validCompletedCount === totalTopics;
 
-      // Update progress info on language
-      langData.completionPercent = totalTopics === 0 ? 0 : (validCompletedCount / totalTopics) * 100;
-      langData.isCompleted = totalTopics > 0 && validCompletedCount === totalTopics;
+      // Step 3b: Award language badge if eligible
+      if (lang.isCompleted && !lang.badgeAwarded) {
+        const badge = await Badge.findOne({ type: 'language', language: langId });
+        const alreadyEarned = user.earnedBadges.some(b => b.badge.toString() === badge?._id.toString());
 
-      // Award language badge if completed and not awarded yet
-      if (langData.isCompleted && !langData.badgeAwarded) {
-        const badge = await Badge.findOne({ type: 'language', language: languageId });
-
-        if (badge && !user.earnedBadges.some(b => b.badge.toString() === badge._id.toString())) {
+        if (badge && !alreadyEarned) {
           user.earnedBadges.push({ badge: badge._id, awardedAt: new Date() });
           newlyEarnedBadges.push(badge);
-          langData.badgeAwarded = true;
+          lang.badgeAwarded = true;
         }
       }
 
@@ -61,28 +55,29 @@ async function calculateUserProgress(user) {
       totalCompletedCourseTopics += validCompletedCount;
     }
 
-    // Update course-level progress
-    courseData.completionPercent = totalCourseTopics === 0
+    // Step 4: Update course progress
+    course.completionPercent = totalCourseTopics === 0
       ? 0
-      : (totalCompletedCourseTopics / totalCourseTopics) * 100;
+      : Math.round((totalCompletedCourseTopics / totalCourseTopics) * 100);
 
-    courseData.isCompleted = totalCourseTopics > 0 && totalCompletedCourseTopics === totalCourseTopics;
+    course.isCompleted = totalCourseTopics > 0 && totalCompletedCourseTopics === totalCourseTopics;
 
-    // Award course badge if completed and not awarded yet
-    if (courseData.isCompleted && !courseData.badgeAwarded) {
-      const courseId = courseData.course._id ? courseData.course._id.toString() : courseData.course.toString();
+    // Step 5: Award course badge if eligible
+    if (course.isCompleted && !course.badgeAwarded) {
+      const courseId = (course.course?._id || course.course).toString();
       const badge = await Badge.findOne({ type: 'course', course: courseId });
+      const alreadyEarned = user.earnedBadges.some(b => b.badge.toString() === badge?._id.toString());
 
-      if (badge && !user.earnedBadges.some(b => b.badge.toString() === badge._id.toString())) {
+      if (badge && !alreadyEarned) {
         user.earnedBadges.push({ badge: badge._id, awardedAt: new Date() });
         newlyEarnedBadges.push(badge);
-        courseData.badgeAwarded = true;
+        course.badgeAwarded = true;
       }
     }
 
-    // Optional: update flat list of completedTopics at course level to unique strings
-    courseData.completedTopics = [
-      ...new Set(courseData.languages.flatMap(l => l.completedTopics.map(id => id.toString())))
+    // Step 6 (optional): Flatten all completed topics at course level
+    course.completedTopics = [
+      ...new Set(course.languages.flatMap(l => l.completedTopics.map(id => id.toString())))
     ];
   }
 

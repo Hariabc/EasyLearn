@@ -1,8 +1,7 @@
 const User = require('../models/User');
 const Course = require('../models/Course');
-const  calculateUserProgress  = require('../utils/progressCalculator.js');
-const mongoose = require('mongoose'); 
 const Topic = require('../models/Topic');
+const calculateUserProgress = require('../utils/progressCalculator'); // handles percent + badge logic
 
 exports.registerUser = async (req, res) => {
   try {
@@ -41,7 +40,6 @@ exports.enrollInCourse = async (req, res) => {
       return res.status(400).json({ message: 'Already enrolled in this course' });
     }
 
-    // Initialize each language with empty completedTopics
     const enrolledLanguages = course.languages.map((lang) => ({
       language: lang._id,
       completedTopics: [],
@@ -62,8 +60,6 @@ exports.enrollInCourse = async (req, res) => {
   }
 };
 
-
-
 exports.markTopicAsCompleted = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -80,37 +76,27 @@ exports.markTopicAsCompleted = async (req, res) => {
     const enrolledLanguage = enrolledCourse.languages.find(l => l.language.toString() === languageId);
     if (!enrolledLanguage) return res.status(404).json({ message: 'Language not enrolled in course' });
 
-    // Add topic to completedTopics (if not already added)
     const alreadyCompleted = enrolledLanguage.completedTopics.some(id => id.toString() === topicId);
     if (!alreadyCompleted) {
       enrolledLanguage.completedTopics.push(topicId);
     }
 
-    // Recalculate progress and award badges
-    const { newlyEarnedBadges } = await calculateUserProgress(user);
+    // ✅ Step 1: Update progress and check for badges
+    const { newlyEarnedBadges } = await calculateUserProgress(user); // handles progress + badge logic
 
-    // Save the updated user document
+    // ✅ Step 2: Save updated user
     await user.save();
 
-    // Repopulate user with necessary details
+    // ✅ Step 3: Repopulate for frontend
     const freshUser = await User.findById(user._id)
-      .populate({
-        path: 'enrolledCourses.course',
-        model: 'Course',
-      })
-      .populate({
-        path: 'enrolledCourses.languages.language',
-        model: 'Language',
-      })
-      .populate({
-        path: 'earnedBadges.badge',
-        model: 'Badge', // Optional: include if you want badge details in frontend
-      });
+      .populate('enrolledCourses.course')
+      .populate('enrolledCourses.languages.language')
+      .populate('earnedBadges.badge'); // if frontend needs badge icons/names
 
-    res.status(200).json({ 
-      message: 'Topic marked as completed', 
-      user: freshUser, 
-      newlyEarnedBadges // Frontend can use this to trigger animation
+    res.status(200).json({
+      message: 'Topic marked as completed',
+      user: freshUser,
+      newlyEarnedBadges, // 🎖️ Use this to trigger UI animations
     });
 
   } catch (err) {
@@ -124,14 +110,8 @@ exports.getEnrolledCourses = async (req, res) => {
     const userId = req.user._id;
 
     const user = await User.findById(userId)
-      .populate({
-        path: 'enrolledCourses.course',
-        model: 'Course',
-      })
-      .populate({
-        path: 'enrolledCourses.languages.language',
-        model: 'Language',
-      });
+      .populate('enrolledCourses.course')
+      .populate('enrolledCourses.languages.language');
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -140,7 +120,3 @@ exports.getEnrolledCourses = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch enrolled courses', error: err.message });
   }
 };
-
-
-
-

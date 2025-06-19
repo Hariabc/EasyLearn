@@ -49,6 +49,8 @@ const CourseDetail = () => {
   const [aiQuizLoading, setAiQuizLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
+  
+
   useEffect(() => {
     const fetchTopicDetails = async () => {
       try {
@@ -73,10 +75,13 @@ const CourseDetail = () => {
     }
   }, [topicId]);
 
+ 
+
   const fetchFeedbackData = async () => {
     try {
       const res = await api.get(`/api/feedbacks/byTopic/${topicId}`);
       setFeedbackData(res.data);
+       
     } catch (err) {
       console.error("Feedback fetch error:", err);
     }
