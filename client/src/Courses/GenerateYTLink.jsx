@@ -12,7 +12,7 @@ const GenerateYTLink = ({ languageId, languageName, topicname }) => {
       const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
       const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
         searchQuery
-      )}&key=${apiKey}&type=video&maxResults=1&order=relevance`;
+      )}&key=${apiKey}&type=video&maxResults=1&order=relevance&videoDuration=medium`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -52,7 +52,7 @@ const GenerateYTLink = ({ languageId, languageName, topicname }) => {
   }, [topicname, languageId, languageName]);
 
   return loading ? (
-    <p className="text-gray-500">Loading video...</p>
+    <p className="text-center text-blue-300 font-medium">Loading video...</p>
   ) : videoLink ? (
     <div className="space-y-8 w-full">
       <div className="relative group w-full">

@@ -48,6 +48,7 @@ const CourseDetail = () => {
   const [aiQuizQuestions, setAiQuizQuestions] = useState([]);
   const [aiQuizLoading, setAiQuizLoading] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [delayCompleted, setDelayCompleted] = useState(false);
 
 
   useEffect(() => {
@@ -219,7 +220,7 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
 
   const generateAIQuiz = async (notesText, retryCount = 0) => {
     if (!notesText || notesText.trim().length < 10) {
-      console.warn("⚠️ No sufficient notes provided to generate quiz.");
+      console.warn("⚠️ Not enough notes to generate quiz.");
       setQuizError(true);
       setAiQuizLoading(false);
       return;
@@ -233,7 +234,7 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
       if (!apiKey) {
         setQuizError(true);
         setAiQuizLoading(false);
-        alert("GROQ API Key missing.");
+        alert("❌ GROQ API Key missing.");
         return;
       }
 
@@ -248,7 +249,28 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
           messages: [
             {
               role: "user",
-              content: `You are a strict quiz generator.\n\nBased on the following study material, generate EXACTLY 5 MCQs in this valid JSON format:\n\n[\n  {\n    \"question\": \"What is ...?\",\n    \"options\": [\"Option 1\", \"Option 2\", \"Option 3\", \"Option 4\"],\n    \"correctAnswer\": \"Option 2\"\n  },\n  ...\n]\n\nImportant rules:\n- Only return pure JSON. No explanation or commentary.\n- All field names and string values must use double quotes.\n- Do not include markdown or \`\`\`json wrappers.\n- If content is not enough, just return []\n\nStudy material: ${notesText}`,
+              content: `
+You are a professional quiz generator.
+
+Based strictly on the following study material, generate EXACTLY 5 multiple-choice questions in this pure JSON format:
+
+[
+  {
+    "question": "Your question here?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": "Option B"
+  },
+  ...
+]
+
+Rules:
+- Use only double quotes (no single quotes).
+- Return ONLY the JSON array — no explanation, no commentary, no markdown, and no surrounding text.
+- If the content is not sufficient to generate questions, return [].
+
+Study material:
+${notesText}
+            `.trim(),
             },
           ],
         }),
@@ -256,8 +278,10 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
 
       const data = await res.json();
       let responseText = data?.choices?.[0]?.message?.content?.trim();
+
       if (!responseText) throw new Error("Empty response from model.");
 
+      // Clean unwanted characters if any
       responseText = responseText
         .replace(/```(json)?/g, "")
         .replace(/""|""/g, '"')
@@ -279,11 +303,12 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
           if (jsonMatch) {
             parsedQuiz = JSON.parse(jsonMatch[0]);
           } else {
-            throw new Error("Could not extract valid JSON array.");
+            throw new Error("❌ Could not extract valid JSON array.");
           }
         }
       }
 
+      // Validate quiz structure
       const isValidQuiz =
         Array.isArray(parsedQuiz) &&
         parsedQuiz.length >= 3 &&
@@ -298,13 +323,12 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
         );
 
       if (!isValidQuiz) {
-        throw new Error("Quiz format invalid or incomplete.");
+        throw new Error("❌ Quiz format invalid or incomplete.");
       }
 
-      // ✅ Save to state and to localStorage
+      // ✅ Save to state and localStorage
       setAiQuizQuestions(parsedQuiz);
       localStorage.setItem("aiQuizQuestions", JSON.stringify(parsedQuiz));
-
     } catch (err) {
       console.error("❌ Error generating quiz:", err);
       setAiQuizQuestions([]);
@@ -313,6 +337,18 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
       setAiQuizLoading(false);
     }
   };
+
+
+  useEffect(() => {
+    if (selectedTab === "Quiz") {
+      setDelayCompleted(false); // reset
+      const timer = setTimeout(() => {
+        setDelayCompleted(true);
+      }, 3000); // 3 seconds delay
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [selectedTab]);
 
   const handleOptionChange = (questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
@@ -431,7 +467,11 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
       case "Quiz":
         return (
           <div className="quiz-container text-white">
-            {aiQuizQuestions.length === 0 ? (
+            {!delayCompleted ? (
+              <Typography className="text-center text-blue-300 font-medium">
+                Please wait... Preparing your quiz.
+              </Typography>
+            ) : aiQuizQuestions.length === 0 ? (
               aiQuizLoading ? (
                 <Typography>Generating Quiz Questions...</Typography>
               ) : !quizError ? (
@@ -555,6 +595,7 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
                     setScore(0);
                     setQuizError(false);
                     setAiQuizQuestions([]);
+                    setDelayCompleted(false); // reset delay on retry
                   }}
                   className="mt-6 bg-[#0A21C0] hover:bg-[#050A44] text-[#B3B4BD]"
                 >

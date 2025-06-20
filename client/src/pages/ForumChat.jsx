@@ -64,7 +64,7 @@ const ForumChat = () => {
 
     const message = {
       senderId: currentUser._id,
-      senderName: currentUser.name,
+      senderName: currentUser.fullName,
       content: newMsg,
     };
 
@@ -114,21 +114,19 @@ const ForumChat = () => {
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`flex flex-col max-w-[70%] ${
-                    msg.senderId === currentUser._id
+                  className={`flex flex-col max-w-[70%] ${msg.senderId === currentUser._id
                       ? "ml-auto items-end"
                       : "items-start"
-                  }`}
+                    }`}
                 >
                   <span className="text-xs text-slate-400 mb-1">
                     {msg.senderName}
                   </span>
                   <div
-                    className={`px-4 py-2 rounded-xl text-sm break-words ${
-                      msg.senderId === currentUser._id
+                    className={`px-4 py-2 rounded-xl text-sm break-words ${msg.senderId === currentUser._id
                         ? "bg-blue-600 text-white"
                         : "bg-slate-700 text-white"
-                    }`}
+                      }`}
                   >
                     {msg.content}
                   </div>
