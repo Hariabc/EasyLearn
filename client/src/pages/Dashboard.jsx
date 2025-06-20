@@ -61,7 +61,7 @@ const Dashboard = () => {
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
-  console.log(authToken);
+  // console.log(authToken);
 
   // Handle window resize to toggle mobile/desktop sidebar state
   useEffect(() => {
