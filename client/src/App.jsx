@@ -25,6 +25,7 @@ import CodeEditor from "./pages/CodeEditor";
 import ResetPassword from "./components/Logins/ResetPassword";
 import Settings from "./pages/Settings";
 import ForumChat from "./pages/ForumChat";
+import EmailSubscription from "./components/EmailSubscription";
 
 function App() {
   return <>
@@ -168,6 +169,13 @@ function App() {
           element={
             <ProtectedRoute>
               <CourseDetail />
+            </ProtectedRoute>
+          }
+        /><Route
+          path="/daily-email"
+          element={
+            <ProtectedRoute>
+              <EmailSubscription />
             </ProtectedRoute>
           }
         />

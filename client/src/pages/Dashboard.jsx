@@ -17,9 +17,11 @@ import {
   CodeBracketIcon,
   SparklesIcon,
 } from "@heroicons/react/24/solid";
+import { FaEnvelope } from "react-icons/fa";
 import logo from "../assets/education_10353866.png";
 import api from "../axios";
 import StreakDisplay from "../components/StreakDisplay";
+import EmailSubscription from "../components/EmailSubscription";
 
 const navItems = [
   {
@@ -46,6 +48,11 @@ const navItems = [
     icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />,
     text: "Discussion Forum",
     path: "/forum",
+  },
+  {
+    icon: <FaEnvelope className="h-6 w-6" />,
+    text: "Daily Email",
+    path: "/daily-email",
   },
 ];
 
@@ -402,7 +409,6 @@ const Dashboard = () => {
         <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6 text-white">
           Welcome, {user.fullName || "User"}!
         </h1>
-
         {/* Ongoing Courses */}
         <section className="bg-slate-800 p-4 lg:p-8 rounded-xl lg:rounded-2xl shadow-lg mb-6 lg:mb-8">
           <h3 className=" lg:text-2xl lg:mb-6 flex items-center gap-2 text-2xl font-semibold text-blue-400 mb-6">
