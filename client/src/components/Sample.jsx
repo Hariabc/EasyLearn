@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Card } from "@material-tailwind/react";
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const features = [
   {
@@ -10,9 +10,9 @@ const features = [
     desc: "Flexible learning with 24/7 access to all lessons and resources.",
   },
   {
-    icon: "🧑‍🏫",
-    title: "Expert Mentors",
-    desc: "Top instructors with real-world experience to guide you.",
+    icon: "📩",
+    title: "Daily Email Lessons",
+    desc: "Get daily emails with topics, quizzes, and key points to boost your learning.",
   },
   {
     icon: "⚡",
@@ -46,7 +46,12 @@ export default function FeatureSection() {
   // Skeleton for section header
   const HeaderSkeleton = () => (
     <div className="text-center mb-16">
-      <Skeleton width={120} height={32} className="mx-auto mb-4" borderRadius={16} />
+      <Skeleton
+        width={120}
+        height={32}
+        className="mx-auto mb-4"
+        borderRadius={16}
+      />
       <Skeleton width={320} height={40} className="mx-auto mb-4" />
       <Skeleton width={260} height={20} className="mx-auto" />
     </div>
@@ -72,22 +77,27 @@ export default function FeatureSection() {
     <section className="bg-slate-900 py-20 px-6 sm:px-8 lg:px-16">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        {loading ? <HeaderSkeleton /> : (
-          <div className="text-center mb-16">
-            <span className="text-sm font-medium bg-blue-500 text-white px-4 py-1 rounded-full tracking-wide">
+        {loading ? (
+          <HeaderSkeleton />
+        ) : (
+          <div className="text-center mb-18">
+            <span className="text-2xl font-medium  bg-blue-500 text-white px-4 py-2 rounded-full tracking-wide mb-9">
               Why EasyLearn?
             </span>
             <h2 className="mt-6 text-4xl font-bold text-white">
               Powerful Features to Boost Your Learning
             </h2>
             <p className="mt-4 text-slate-400 max-w-xl mx-auto">
-              Everything you need to upskill efficiently — built with care, clarity, and simplicity.
+              Everything you need to upskill efficiently — built with care,
+              clarity, and simplicity.
             </p>
           </div>
         )}
 
         {/* Features Grid */}
-        {loading ? <FeaturesGridSkeleton /> : (
+        {loading ? (
+          <FeaturesGridSkeleton />
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {features.map((feature, idx) => (
               <Card
@@ -97,7 +107,10 @@ export default function FeatureSection() {
                 <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 text-white text-xl mb-4">
                   {feature.icon}
                 </div>
-                <Typography variant="h6" className="text-white font-semibold mb-2">
+                <Typography
+                  variant="h6"
+                  className="text-white font-semibold mb-2"
+                >
                   {feature.title}
                 </Typography>
                 <Typography className="text-slate-400 text-sm leading-relaxed">

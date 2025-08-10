@@ -6,16 +6,14 @@ import CoursesPage from "../pages/CoursesPage";
 import logo from "../assets/logo.png";
 import graduateImg from "../assets/bg-2.png";
 import Footer from "./Footer";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 
 function HeroSection() {
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
+    // Start fade-in animation after component mounts
+    setTimeout(() => setFadeIn(true), 100);
   }, []);
 
   // Close menu when window is resized
@@ -28,65 +26,6 @@ function HeroSection() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Skeleton for hero section
-  const HeroSkeleton = () => (
-    <header className="relative min-h-screen bg-slate-900 pt-10">
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
-          {/* Left Column */}
-          <div className="text-center lg:text-left pt-4">
-            <Skeleton
-              width={260}
-              height={32}
-              className="mx-auto lg:mx-0 mb-6 glow"
-              borderRadius={16}
-            />
-            <Skeleton
-              width={420}
-              height={56}
-              className="mx-auto lg:mx-0 mb-6 glow"
-            />
-            <Skeleton
-              width={340}
-              height={28}
-              className="mx-auto lg:mx-0 mb-8 glow"
-            />
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Skeleton
-                width={180}
-                height={48}
-                borderRadius={12}
-                className="glow"
-              />
-              <Skeleton
-                width={180}
-                height={48}
-                borderRadius={12}
-                className="glow"
-              />
-            </div>
-          </div>
-          {/* Right Column */}
-          <div className="hidden lg:block">
-            <Skeleton height={320} width={320} className="mx-auto glow" />
-          </div>
-        </div>
-        {/* Stats Section */}
-        <div className="mt-0 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[...Array(4)].map((_, idx) => (
-            <div
-              key={idx}
-              className="p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg"
-            >
-              <Skeleton width={60} height={36} className="mx-auto mb-2 glow" />
-              <Skeleton width={80} height={20} className="mx-auto glow" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </header>
-  );
 
   return (
     <>
@@ -162,89 +101,91 @@ function HeroSection() {
         )}
       </nav>
       {/* Hero Section */}
-      {loading ? (
-        <HeroSkeleton />
-      ) : (
-        <header className="relative bg-slate-900 pt-10 sm:mb-10 mt-4">
-          {/* Hero Content */}
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 pt-16 sm:pt-10 pb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              {/* Left Column - Text Content */}
-              <div className="text-left">
-                <div className="inline-flex items-center justify-center lg:justify-start px-4 py-1.5 rounded-full bg-[var(--color-primary-main)]/10 text-white text-sm font-medium mb-6">
-                  🚀 Start Your Learning Journey Today
-                </div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-                  Learn Without Limits using{" "}
-                  <span className="text-[var(--color-primary-main)]">
-                    EasyLearn
-                  </span>
-                </h1>
-                <p className="text-lg sm:text-xl text-white mb-8 max-w-2xl mx-auto lg:mx-0">
-                  Discover a world of knowledge with our expert-led courses.
-                  Learn at your own pace, earn certificates, and transform your
-                  career.
-                </p>
-                <div className="flex flex-row sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Link to="/courses">
-                    <button className="px-8 py-3 bg-[var(--color-primary-main)] text-white rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                      Explore
-                    </button>
-                  </Link>
-                  <Link to="/register">
-                    <button className="px-8 py-3 border-2 border-[var(--color-primary-main)] text-[var(--color-primary-main)] rounded-lg hover:bg-[var(--color-primary-main)] hover:text-white transition-colors">
-                      Get Started
-                    </button>
-                  </Link>
-                </div>
+      <header 
+        className={`relative bg-slate-900 pt-10 sm:mb-10 mt-4 transition-all duration-1000 ease-out ${
+          fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 pt-16 sm:pt-10 pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Text Content */}
+            <div className={`text-left transition-all duration-700 delay-200 ${
+              fadeIn ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+            }`}>
+              <div className={`inline-flex items-center justify-center lg:justify-start px-4 py-1.5 rounded-full bg-[var(--color-primary-main)]/10 text-white text-sm font-medium mb-6 transition-all duration-500 delay-300 ${
+                fadeIn ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`}>
+                🚀 Start Your Learning Journey Today
               </div>
-              {/* Right Column - Image */}
-              <div className="hidden lg:block">
-                <img
-                  src={graduateImg}
-                  alt="Student Learning"
-                  className="w-full scale-90 max-w-lg mx-auto"
-                />
+              <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight transition-all duration-500 delay-400 ${
+                fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}>
+                Learn Without Limits using{" "}
+                <span className="text-[var(--color-primary-main)]">
+                  EasyLearn
+                </span>
+              </h1>
+              <p className={`text-lg sm:text-xl text-white mb-8 max-w-2xl mx-auto lg:mx-0 transition-all duration-500 delay-500 ${
+                fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}>
+                Discover a world of knowledge with our expert-led courses.
+                Learn at your own pace, earn certificates, and transform your
+                career.
+              </p>
+              <div className={`flex flex-row sm:flex-row gap-4 justify-center lg:justify-start transition-all duration-500 delay-600 ${
+                fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}>
+                <Link to="/courses">
+                  <button className="px-8 py-3 bg-[var(--color-primary-main)] text-white rounded-lg hover:bg-[var(--color-primary-dark)] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    Explore
+                  </button>
+                </Link>
+                <Link to="/register">
+                  <button className="px-8 py-3 border-2 border-[var(--color-primary-main)] text-[var(--color-primary-main)] rounded-lg hover:bg-[var(--color-primary-main)] hover:text-white transition-all duration-300">
+                    Get Started
+                  </button>
+                </Link>
               </div>
             </div>
-            {/* Stats Section */}
-            <div className="mt-10 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-3xl font-bold text-[var(--color-primary-main)] mb-2">
-                  10K+
-                </div>
-                <div className="text-[var(--color-text-secondary)]">
-                  Active Students
-                </div>
-              </div>
-              <div className="p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-3xl font-bold text-[var(--color-primary-main)] mb-2">
-                  10+
-                </div>
-                <div className="text-[var(--color-text-secondary)]">
-                  Courses
-                </div>
-              </div>
-              <div className="p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-3xl font-bold text-[var(--color-primary-main)] mb-2">
-                  AI
-                </div>
-                <div className="text-[var(--color-text-secondary)]">
-                  Doubt Solver
-                </div>
-              </div>
-              <div className="p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-3xl font-bold text-[var(--color-primary-main)] mb-2">
-                  Daily
-                </div>
-                <div className="text-[var(--color-text-secondary)]">
-                  Streaks
-                </div>
-              </div>
+            {/* Right Column - Image */}
+            <div className={`hidden lg:block transition-all duration-700 delay-300 ${
+              fadeIn ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-8 scale-95'
+            }`}>
+              <img
+                src={graduateImg}
+                alt="Student Learning"
+                className="w-full scale-90 max-w-lg mx-auto"
+              />
             </div>
           </div>
-        </header>
-      )}
+          {/* Stats Section */}
+          <div className={`mt-10 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center transition-all duration-700 delay-700 ${
+            fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
+            {[
+              { number: "10K+", label: "Active Students" },
+              { number: "10+", label: "Courses" },
+              { number: "AI", label: "Doubt Solver" },
+              { number: "Daily", label: "Streaks" }
+            ].map((stat, idx) => (
+              <div 
+                key={idx}
+                className={`p-6 bg-[var(--color-background-paper)] rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 delay-${800 + idx * 100} ${
+                  fadeIn ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
+                }`}
+              >
+                <div className="text-3xl font-bold text-[var(--color-primary-main)] mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-[var(--color-text-secondary)]">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
       <FeatureSection />
       <CoursesPage />
       <Footer />
