@@ -106,7 +106,7 @@ const CourseDetail = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3-70b-8192",
+          model: "llama-3.3-70b-versatile",
           temperature: 0.4,
           max_tokens: 4096,
           messages: [
@@ -152,7 +152,7 @@ const CourseDetail = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3-70b-8192",
+          model: "llama-3.3-70b-versatile",
           temperature: 0.4,
           max_tokens: 4096,
           messages: [
@@ -245,7 +245,7 @@ Ensure the output is clean, student-friendly, and directly displayable in a Reac
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3-70b-8192",
+          model: "llama-3.3-70b-versatile",
           messages: [
             {
               role: "user",
