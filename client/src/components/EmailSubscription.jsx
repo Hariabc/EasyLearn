@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 export default function EmailSubscription() {
-  const API_BASE = "https://cn-learning-agent.onrender.com/api";
+ const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api"
+    : "https://cn-learning-agent.onrender.com/api";
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
